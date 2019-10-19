@@ -54,8 +54,6 @@ public class ProviderController {
 	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
 		
-		//check if request has authorization header, if yes show public and private datasets
-		//TO DO: Else provide only public datasets
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
