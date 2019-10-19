@@ -34,8 +34,7 @@ public class ProviderController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	public List<ProviderBean> findInformation() {
-		//this method under development
-		System.out.println("Retrieving provider information : findInformation() ");
+		System.out.println("Retrieving provider information : findByUsername() ");
 		List<ProviderBean> result = new ArrayList<ProviderBean>();
 		long id = 1;
 		Provider provider = providerDao.findByUsername("ccrc_user"); 
@@ -53,23 +52,16 @@ public class ProviderController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProviderDatasets", produces="application/json")
 	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Retrieving provider's uploaded dataset information : getProviderDataSets() ");		
+		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
 		
 		//check if request has authorization header, if yes show public and private datasets
 		//TO DO: Else provide only public datasets
 		final String requestTokenHeader = request.getHeader("Authorization");
-		
-		//token starts after 7th position as token is appnended with 'Bearer' 
 		String jwtToken = requestTokenHeader.substring(7);
-		
-		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 
-		//get provider data by username
 		Provider provider = providerDao.findByUsername(username); 
 		String providerName = provider.getName();
-		
-		//search in the dataset, the dataset owned by current provider
 		List<DatasetBean> result =new ArrayList<DatasetBean>();
 	
 		for (Dataset ds : datasetDAO.findAll()) {
