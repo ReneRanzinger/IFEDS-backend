@@ -34,7 +34,8 @@ public class ProviderController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	public List<ProviderBean> findInformation() {
-		System.out.println("Retrieving provider information : findByUsername() ");
+		//this method under development
+		System.out.println("Retrieving provider information : findInformation() ");
 		List<ProviderBean> result = new ArrayList<ProviderBean>();
 		long id = 1;
 		Provider provider = providerDao.findByUsername("ccrc_user"); 
@@ -52,14 +53,21 @@ public class ProviderController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProviderDatasets", produces="application/json")
 	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
+		System.out.println("Retrieving provider's uploaded dataset information : getProviderDataSets() ");		
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
+		
+		//token starts after 7th position as token is appnended with 'Bearer' 
 		String jwtToken = requestTokenHeader.substring(7);
+		
+		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 
+		//get provider data by username
 		Provider provider = providerDao.findByUsername(username); 
 		String providerName = provider.getName();
+		
+		//search in the dataset, the dataset owned by current provider
 		List<DatasetBean> result =new ArrayList<DatasetBean>();
 	
 		for (Dataset ds : datasetDAO.findAll()) {
