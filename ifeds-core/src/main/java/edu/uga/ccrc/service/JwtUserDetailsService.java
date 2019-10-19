@@ -32,16 +32,8 @@ public class JwtUserDetailsService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 		
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), "$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
 				new ArrayList<>());
-		/*
-		if ("javainuse".equals(username)) {
-			//encoder to do
-			return new User("javainuse", "$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
-					new ArrayList<>());
-		} else {
-			throw new UsernameNotFoundException("User not found with username: " + username);
-		}
-		*/
+	
 	}
 }
