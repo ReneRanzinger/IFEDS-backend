@@ -92,7 +92,8 @@ CREATE TABLE core.dataset
 	name VARCHAR(256) NOT NULL UNIQUE,
 	sample_id integer NOT NULL REFERENCES core.sample ON UPDATE CASCADE ON DELETE CASCADE,
 	provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
-	description VARCHAR(1000) 
+	description VARCHAR(1000),
+	is_public BOOLEAN NOT NULL
 );
 
 CREATE TABLE core.data_type
