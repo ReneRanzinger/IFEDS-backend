@@ -32,6 +32,9 @@ public class Dataset {
 	@Column(length=1000)
 	private String description;
 	
+	@Column(name="is_public",nullable=false)
+	private Boolean isPublic;
+	
 	protected Dataset() {}
 
 	public Long getDatasetId() {
@@ -72,5 +75,13 @@ public class Dataset {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Boolean isPublic() {
+		return isPublic;
+	}
+
+	public void setIsPublic(Boolean isPublic) {
+		this.isPublic = isPublic;
 	}
 }
