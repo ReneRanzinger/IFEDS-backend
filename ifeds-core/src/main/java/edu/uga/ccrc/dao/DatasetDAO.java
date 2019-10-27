@@ -12,4 +12,6 @@ public interface DatasetDAO extends JpaRepository<Dataset,Long>{
 	
 	@Query(value="SELECT * FROM core.dataset where is_public = TRUE OR provider_id = ?1",nativeQuery=true)
 	Iterable<Dataset> findPublicAndProviderDatasets(Long pid);
+	
+	void deleteById(long id);
 }
