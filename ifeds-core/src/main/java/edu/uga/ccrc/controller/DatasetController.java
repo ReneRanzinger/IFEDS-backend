@@ -80,9 +80,28 @@ public class DatasetController {
 		return res;
 	}
 	@RequestMapping(method = RequestMethod.DELETE, value = "/datasets/{id}", produces="application/json")
-	public void deleteDataset(@PathVariable long id) {
+	public String deleteDataset(@PathVariable long id, HttpServletRequest request) {
 		System.out.println("Deleting datasets : deleteDataset() id : " + id);
-		datasetDAO.deleteById(id);
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		Provider provider = providerDao.findByUsername(username);
+		
+		
+		Dataset dataset = datasetDAO.findDatasetById(id);
+		
+		//if dataset doesn't exist then delete it
+		if(dataset == null)
+			return "No dataset exists with the given id";
+		
+		//check if the user/provider is authenticate to delete the dataset
+		if(dataset.getProvider().getUsername() == provider.getUsername()) {
+			
+			datasetDAO.deleteById(id);
+			return "Successfuly deleted";
+		}
+			
+		return "Unauthorized to delete the dataset. You are not the owner of the dataset";
 		
 		
 	}
