@@ -1,6 +1,8 @@
 package edu.uga.ccrc.view.bean;
 
-public class ProviderBean {
+import edu.uga.ccrc.entity.Provider;
+
+public class ProviderBean{
 	
 	private Long providerId;
 	private String name;
@@ -10,10 +12,22 @@ public class ProviderBean {
 	private String url;
 	private String contact;
 	private String username;
-	private String password;
 	private String email;
-	private String authToken;
-	private Integer authTimeOut;
+	
+	public ProviderBean() {}
+	
+	public ProviderBean(Provider p) {
+		this.providerId=p.getProviderId();
+		this.name=p.getName();
+		this.providerGroup=p.getProviderGroup();
+		this.department=p.getDepartment();
+		this.affiliation=p.getAffiliation();
+		this.url=p.getUrl();
+		this.contact=p.getContact();
+		this.username=p.getUsername();
+		this.email=p.getEmail();
+		
+	}
 	
 	public void setUserName(String username)
 	{
@@ -23,13 +37,6 @@ public class ProviderBean {
 	public String getUserName()
 	{
 		return	 username;
-	}
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 	
 	public void setName(String name) {
@@ -103,22 +110,4 @@ public class ProviderBean {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
-	public Integer getAuthTimeOut() {
-		return authTimeOut;
-	}
-
-	public void setAuthTimeOut(Integer authTimeOut) {
-		this.authTimeOut = authTimeOut;
-	}
-
-	
 }

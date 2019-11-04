@@ -1,5 +1,7 @@
 package edu.uga.ccrc.entity;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -35,6 +38,21 @@ public class Dataset {
 	@Column(name="is_public",nullable=false)
 	private Boolean isPublic;
 	
+	@OneToMany(mappedBy = "dataset")
+    Set<DatasetToExperimentType> datasetToExperimentTypes;
+	
+	@OneToMany(mappedBy = "dataset")
+    Set<DatasetToPaper> datasetToPapers;
+	
+	@OneToMany(mappedBy = "dataset")
+    Set<DatasetToKeyword> datasetToKeywords;
+	
+	@OneToMany(mappedBy = "dataset")
+    Set<FundingGrant> fundingGrant;
+	
+	@OneToMany(mappedBy = "dataset")
+    Set<DataFile> dataFiles;
+
 	protected Dataset() {}
 
 	public Long getDatasetId() {
@@ -83,5 +101,45 @@ public class Dataset {
 
 	public void setIsPublic(Boolean isPublic) {
 		this.isPublic = isPublic;
+	}
+
+	public Set<DatasetToExperimentType> getDatasetToExperimentTypes() {
+		return datasetToExperimentTypes;
+	}
+
+	public void setDatasetToExperimentTypes(Set<DatasetToExperimentType> datasetToExperimentTypes) {
+		this.datasetToExperimentTypes = datasetToExperimentTypes;
+	}
+
+	public Set<DatasetToPaper> getDatasetToPapers() {
+		return datasetToPapers;
+	}
+
+	public void setDatasetToPapers(Set<DatasetToPaper> datasetToPapers) {
+		this.datasetToPapers = datasetToPapers;
+	}
+
+	public Set<DatasetToKeyword> getDatasetToKeywords() {
+		return datasetToKeywords;
+	}
+
+	public void setDatasetToKeywords(Set<DatasetToKeyword> datasetToKeywords) {
+		this.datasetToKeywords = datasetToKeywords;
+	}
+
+	public Set<FundingGrant> getFundingGrant() {
+		return fundingGrant;
+	}
+
+	public void setFundingGrant(Set<FundingGrant> fundingGrant) {
+		this.fundingGrant = fundingGrant;
+	}
+
+	public Set<DataFile> getDataFiles() {
+		return dataFiles;
+	}
+
+	public void setDataFiles(Set<DataFile> dataFiles) {
+		this.dataFiles = dataFiles;
 	}
 }
