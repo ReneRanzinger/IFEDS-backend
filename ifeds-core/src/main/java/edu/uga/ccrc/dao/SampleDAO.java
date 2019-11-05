@@ -9,11 +9,14 @@ import org.springframework.stereotype.Repository;
 import edu.uga.ccrc.entity.Sample;
 
 @Repository
-public interface SampleDAO extends CrudRepository<Sample, Integer> {
+public interface SampleDAO extends CrudRepository<Sample, Long> {
 
 	 @Query(value = "SELECT * FROM core.Sample WHERE provider_id = :provider_id", nativeQuery = true)
 	 public List<Sample> findSampleByProviderId(Long provider_id);
 	
+	 public Sample save(Sample newSample);
+	 
+	 void deleteById(Long id);
 	
 }
 
