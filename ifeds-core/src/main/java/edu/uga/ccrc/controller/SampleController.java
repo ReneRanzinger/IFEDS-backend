@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import edu.uga.ccrc.dao.SampleDAO;
 import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.entity.Sample;
+import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.SampleBean;
 
@@ -70,16 +72,16 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
-	public Sample createSample(HttpServletRequest request, @RequestBody Sample sample) {
-		
-		System.out.println(sample.getName());
-		System.out.println(sample.getUrl());
-		
-		//System.out.println(sample.getProvider().getProviderId());
-		//Sample saved = sampleDAO.save(sample);
-		return null;
+	public Sample createSample(HttpServletRequest request, @Valid  @RequestBody Sample sample) {
 	
-	
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		//get username from token
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		Provider owner = providerDao.findByUsername(username);
+		sample.setProvider(owner);
+		Sample saved = sampleDAO.save(sample);
+		return saved;
 	
 	}
 	
@@ -94,4 +96,6 @@ public class SampleController {
 		
 		return res;
 	}
+	
+	
 }
