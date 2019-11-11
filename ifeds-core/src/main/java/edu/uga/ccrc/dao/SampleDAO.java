@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import edu.uga.ccrc.entity.Sample;
+import edu.uga.ccrc.view.bean.SampleBean;
 
 @Repository
 public interface SampleDAO extends CrudRepository<Sample, Long> {

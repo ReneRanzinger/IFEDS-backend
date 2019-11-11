@@ -48,7 +48,7 @@ public class Sample {
 	@OneToMany(mappedBy = "sample", cascade = CascadeType.ALL)
 	Set<Dataset> datasets;
 	
-	protected Sample() {}
+	public Sample() {}
 
 	public Long getSampleId() {
 		return sampleId;

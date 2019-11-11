@@ -22,9 +22,9 @@ public class SampleToSampleDescriptorPK implements Serializable{
 	private String sampleDescriptorValue;
 	
 	public SampleToSampleDescriptorPK(Sample sample, SampleDescriptor sampleDescriptor, String sampleDescriptorValue) {
-		this.sample=sample;
-		this.sampleDescriptor=sampleDescriptor;
-		this.sampleDescriptorValue=sampleDescriptorValue;
+		this.sample = sample;
+		this.sampleDescriptor = sampleDescriptor;
+		this.sampleDescriptorValue = sampleDescriptorValue;
 	}
 
 	public Sample getSample() {
