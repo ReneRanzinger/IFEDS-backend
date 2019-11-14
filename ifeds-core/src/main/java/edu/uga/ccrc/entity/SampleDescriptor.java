@@ -1,10 +1,13 @@
 package edu.uga.ccrc.entity;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -30,6 +33,9 @@ public class SampleDescriptor {
 	
 	@Column(name="link_pattern", length=256)
 	private String linkPattern;
+	
+	@OneToMany(mappedBy = "sampleDescriptor")
+    Set<SampleToSampleDescriptor> sampleToSampleDescriptors;
 	
 	protected SampleDescriptor() {}
 
@@ -80,5 +86,4 @@ public class SampleDescriptor {
 	public void setLinkPattern(String linkPattern) {
 		this.linkPattern = linkPattern;
 	}
-
 }

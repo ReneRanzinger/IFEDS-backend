@@ -1,9 +1,7 @@
-package edu.uga.ccrc.view.bean;
+ package edu.uga.ccrc.view.bean;
 
 import java.util.Set;
 
-import edu.uga.ccrc.entity.ExperimentType;
-import edu.uga.ccrc.entity.FundingSource;
 import edu.uga.ccrc.entity.Keyword;
 import edu.uga.ccrc.entity.Paper;
 
@@ -15,17 +13,17 @@ public class DatasetDetailBean{
 	
 	private String description;
 	
-	private SampleBean sample;
+	private SampleWithDescriptorListBean sample;
 	
 	private ProviderBean provider;
 	
-	private Set<ExperimentType> experimentTypeSet;
+	private Set<DatasetToExperimentTypeBean> experimentTypes;
 	
 	private Set<Paper> papers;
 	
 	private Set<Keyword> keywords;
 	
-	private Set<FundingSource> fundingSource;
+	private Set<FundingGrantBean> fundingSources;
 	
 	private Set<DataFileBean> dataFiles;
 
@@ -53,11 +51,11 @@ public class DatasetDetailBean{
 		this.description = description;
 	}
 	
-	public SampleBean getSample() {
+	public SampleWithDescriptorListBean getSample() {
 		return sample;
 	}
 
-	public void setSample(SampleBean sample) {
+	public void setSample(SampleWithDescriptorListBean sample) {
 		this.sample = sample;
 	}
 
@@ -69,12 +67,12 @@ public class DatasetDetailBean{
 		this.provider = provider;
 	}
 
-	public Set<ExperimentType> getExperimentTypeSet() {
-		return experimentTypeSet;
+	public Set<DatasetToExperimentTypeBean> getExperimentTypes() {
+		return experimentTypes;
 	}
 
-	public void setExperimentTypeSet(Set<ExperimentType> experimentTypeSet) {
-		this.experimentTypeSet = experimentTypeSet;
+	public void setExperimentTypes(Set<DatasetToExperimentTypeBean> experimentTypes) {
+		this.experimentTypes = experimentTypes;
 	}
 
 	public Set<Paper> getPapers() {
@@ -93,12 +91,12 @@ public class DatasetDetailBean{
 		this.keywords = keywords;
 	}
 
-	public Set<FundingSource> getFundingSource() {
-		return fundingSource;
+	public Set<FundingGrantBean> getFundingSources() {
+		return fundingSources;
 	}
 
-	public void setFundingSource(Set<FundingSource> fundingSource) {
-		this.fundingSource = fundingSource;
+	public void setFundingSources(Set<FundingGrantBean> fundingSources) {
+		this.fundingSources = fundingSources;
 	}
 
 	public Set<DataFileBean> getDataFiles() {

@@ -6,7 +6,7 @@ public class SampleBean{
 	
 	private Long sampleId;
 	
-	private Long sample_type_id;
+	private Long sampleTypeId;
 	
 	private String name;
 	
@@ -18,7 +18,7 @@ public class SampleBean{
     
     public SampleBean(Sample sample) {
     	this.sampleId=sample.getSampleId();
-    	this.sample_type_id = sample.getSampleId();
+    	this.sampleTypeId = sample.getSampleType().getSampleTypeId();
 		this.name=sample.getName();
 		this.description=sample.getDescription();
 		this.url=sample.getUrl();
@@ -62,10 +62,10 @@ public class SampleBean{
 	}
 
 	public Long getSample_type_id() {
-		return sample_type_id;
+		return sampleTypeId;
 	}
 
 	public void setSample_type_id(Long sample_type_id) {
-		this.sample_type_id = sample_type_id;
+		this.sampleTypeId = sample_type_id;
 	}
 }

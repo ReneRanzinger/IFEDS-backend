@@ -27,9 +27,7 @@ import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.DatasetToExperimentType;
 import edu.uga.ccrc.entity.DatasetToKeyword;
 import edu.uga.ccrc.entity.DatasetToPaper;
-import edu.uga.ccrc.entity.ExperimentType;
 import edu.uga.ccrc.entity.FundingGrant;
-import edu.uga.ccrc.entity.FundingSource;
 import edu.uga.ccrc.entity.Keyword;
 import edu.uga.ccrc.entity.Paper;
 import edu.uga.ccrc.entity.Provider;
@@ -37,8 +35,10 @@ import edu.uga.ccrc.entity.Sample;
 import edu.uga.ccrc.view.bean.DataFileBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DatasetDetailBean;
+import edu.uga.ccrc.view.bean.DatasetToExperimentTypeBean;
+import edu.uga.ccrc.view.bean.FundingGrantBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
-import edu.uga.ccrc.view.bean.SampleBean;
+import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
 
 @RestController
 public class DatasetController {
@@ -111,7 +111,7 @@ public class DatasetController {
 	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) {
 
 		System.out.println("Retrieving dataset detail : getDatasetDetail() ");
-		
+
 		DatasetDetailBean b = new DatasetDetailBean();
 
 		// Check if request header contains authorization token
@@ -137,7 +137,8 @@ public class DatasetController {
 			System.out.println("Provider id :" + provider.getProviderId() + " " + "Dataset id :" + datasetId);
 
 			// Allow provider to view dataset detail if he's the owner
-			Iterator<Dataset> dsIter = datasetDAO.checkforProviderDataset(datasetId, provider.getProviderId()).iterator();
+			Iterator<Dataset> dsIter = datasetDAO.checkforProviderDataset(datasetId, provider.getProviderId())
+					.iterator();
 			if (dsIter.hasNext()) {
 				b = populateDatasetDetailBean(b, dsIter.next());
 			} else {
@@ -145,7 +146,6 @@ public class DatasetController {
 				System.out.println("Dataset cannot be accessed without authorization");
 			}
 		}
-
 		return b;
 	}
 
@@ -156,7 +156,7 @@ public class DatasetController {
 		b.setDescription(ds.getDescription());
 
 		Sample sample = ds.getSample();
-		SampleBean sb = new SampleBean(sample);
+		SampleWithDescriptorListBean sb = new SampleWithDescriptorListBean(sample);
 		b.setSample(sb);
 
 		Provider provider = ds.getProvider();
@@ -164,11 +164,14 @@ public class DatasetController {
 		b.setProvider(pb);
 
 		Set<DatasetToExperimentType> de = ds.getDatasetToExperimentTypes();
-		Set<ExperimentType> expSet = new HashSet<ExperimentType>();
+		Set<DatasetToExperimentTypeBean> expSet = new HashSet<DatasetToExperimentTypeBean>();
 		for (DatasetToExperimentType dx : de) {
-			expSet.add(dx.getExperimentType());
+			DatasetToExperimentTypeBean deb = new DatasetToExperimentTypeBean();
+			deb.setExperimentType(dx.getExperimentType());
+			deb.setDescription(dx.getDescription());
+			expSet.add(deb);
 		}
-		b.setExperimentTypeSet(expSet);
+		b.setExperimentTypes(expSet);
 
 		Set<DatasetToPaper> dp = ds.getDatasetToPapers();
 		Set<Paper> paperSet = new HashSet<Paper>();
@@ -185,11 +188,14 @@ public class DatasetController {
 		b.setKeywords(kwSet);
 
 		Set<FundingGrant> fg = ds.getFundingGrant();
-		Set<FundingSource> fsSet = new HashSet<FundingSource>();
+		Set<FundingGrantBean> fgBeanSet = new HashSet<FundingGrantBean>();
 		for (FundingGrant f : fg) {
-			fsSet.add(f.getFundingSource());
+			FundingGrantBean fgb = new FundingGrantBean();
+			fgb.setFundingSource(f.getFundingSource());
+			fgb.setGrantNumber(f.getFundingGrantPK().getGrantNumber());
+			fgBeanSet.add(fgb);
 		}
-		b.setFundingSource(fsSet);
+		b.setFundingSources(fgBeanSet);
 
 		Set<DataFile> df = ds.getDataFiles();
 		Set<DataFileBean> dfBeanSet = new HashSet<DataFileBean>();

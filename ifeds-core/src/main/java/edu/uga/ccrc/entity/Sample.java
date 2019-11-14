@@ -48,6 +48,9 @@ public class Sample {
 	@OneToMany(mappedBy = "sample", cascade = CascadeType.ALL)
 	Set<Dataset> datasets;
 	
+	@OneToMany(mappedBy = "sample")
+    Set<SampleToSampleDescriptor> sampleToSampleDescriptors;
+	
 	public Sample() {}
 
 	public Long getSampleId() {
@@ -104,6 +107,14 @@ public class Sample {
 
 	public void setDatasets(Set<Dataset> datasets) {
 		this.datasets = datasets;
+	}
+
+	public Set<SampleToSampleDescriptor> getSampleToSampleDescriptors() {
+		return sampleToSampleDescriptors;
+	}
+
+	public void setSampleToSampleDescriptors(Set<SampleToSampleDescriptor> sampleToSampleDescriptors) {
+		this.sampleToSampleDescriptors = sampleToSampleDescriptors;
 	}
 
 }

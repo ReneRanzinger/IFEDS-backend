@@ -30,6 +30,5 @@ public class DatasetToExperimentTypePK implements Serializable{
 
 	public void setExperimentTypeId(Long experimentTypeId) {
 		this.experimentTypeId = experimentTypeId;
-	}
-	
+	}	
 }
