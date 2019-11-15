@@ -1,0 +1,169 @@
+{
+    "datasetId": 1,
+    "datasetName": "Stem Cell Dataset for Infrasturucture of Experimental Data Analysis 1",
+    "description": "Glycomics analysis performed with the stem cell data set 1- comprehensive study of glycomes including genetic, physiologic, pathologic, and other aspects",
+    "sample": {
+        "sampleId": 1,
+        "name": "Differenciated smooth muscle cell",
+        "description": "Smooth muscle cell derived after differentiation from human embryonic stem cell.",
+        "url": null,
+        "sampleDescriptors": [
+            {
+                "sampleDescriptor": {
+                    "sampleDescriptorId": 2,
+                    "name": "Tissue",
+                    "description": "Tissue the sample was derived from.",
+                    "namespace": "Smooth muscle",
+                    "url": "https://www.nlm.nih.gov/mesh/meshhome.html",
+                    "linkPattern": null
+                },
+                "value": "Smooth muscle",
+                "unitOfMeasurement": null
+            },
+            {
+                "sampleDescriptor": {
+                    "sampleDescriptorId": 1,
+                    "name": "Species",
+                    "description": "Organism that the sample was derived from.",
+                    "namespace": "Homo Sapiens",
+                    "url": "https://www.ncbi.nlm.nih.gov/taxonomy",
+                    "linkPattern": null
+                },
+                "value": "Homo Sapiens",
+                "unitOfMeasurement": null
+            }
+        ]
+    },
+    "provider": {
+        "providerId": 1,
+        "name": "CCRC1",
+        "providerGroup": null,
+        "department": null,
+        "affiliation": null,
+        "url": null,
+        "contact": null,
+        "username": "ccrc_user1",
+        "email": "ccrc1@gmail.com",
+        "userName": "ccrc_user1"
+    },
+    "experimentTypes": [
+        {
+            "experimentType": {
+                "experimentTypeId": 2,
+                "name": "Tandem MS",
+                "description": "Mass spectrometry study using MS/MS techniques.",
+                "url": "https://en.wikipedia.org/wiki/Tandem_mass_spectrometry"
+            },
+            "description": "Tandem MS was performed to identify the pool of N-glycans"
+        },
+        {
+            "experimentType": {
+                "experimentTypeId": 3,
+                "name": "LC-MS/MS",
+                "description": "Structural study using liquid chromatography tandem mass spectrometry.",
+                "url": "https://en.wikipedia.org/wiki/Liquid_chromatography%E2%80%93mass_spectrometry"
+            },
+            "description": "LC-MS/MS was performed to identify the pool of O-Glycans"
+        }
+    ],
+    "papers": [
+        {
+            "paperId": 2,
+            "title": "GlycomeDB",
+            "authorList": "Ranzinger R, York WS",
+            "journalName": null,
+            "pmid": 25753706,
+            "url": "https://link.springer.com/protocol/10.1007%2F978-1-4939-2343-4_8"
+        },
+        {
+            "paperId": 1,
+            "title": "gFinder: A Web-Based Bioinformatics Tool for the Analysis of N-Glycopeptides.",
+            "authorList": "Kim JW, Hwang H, Lim JS, Lee HJ, Jeong SK, Yoo JS, Paik YK",
+            "journalName": null,
+            "pmid": 27573070,
+            "url": "https://pubs.acs.org/doi/10.1021/acs.jproteome.6b00772"
+        }
+    ],
+    "keywords": [
+        {
+            "keywordId": 1,
+            "name": "glycomics",
+            "description": "Data related to the expresion of carbhydrate structures, their attachement to glycoconjugates and their function.",
+            "url": "https://en.wikipedia.org/wiki/Glycomics"
+        },
+        {
+            "keywordId": 2,
+            "name": "glycoproteomics",
+            "description": "Data related to the expression of glycoproteins/glycopeptides, their abundance and function.",
+            "url": "https://en.wikipedia.org/wiki/Glycoproteomics"
+        }
+    ],
+    "fundingSources": [
+        {
+            "fundingSource": {
+                "fundingSourceId": 1,
+                "name": "National Institutes of Health",
+                "abbreviation": "NIH",
+                "url": "https://www.nih.gov/"
+            },
+            "grantNumber": "1U01GM125267 - 01"
+        }
+    ],
+    "dataFiles": [
+        {
+            "dataFileId": 3,
+            "dataType": {
+                "dataTypeId": 1,
+                "name": "MS",
+                "description": "Mass spectrometry data file.",
+                "url": null
+            },
+            "origFileName": "MP-hStem10std_120424130807_xt.raw",
+            "description": "eXtract quantification file for the MS run"
+        },
+        {
+            "dataFileId": 2,
+            "dataType": {
+                "dataTypeId": 1,
+                "name": "MS",
+                "description": "Mass spectrometry data file.",
+                "url": null
+            },
+            "origFileName": "MP-hStem10stdfrag2-2_120503120725.mzXML",
+            "description": "MzXML standard file for the Tandem MS N-glycan Run"
+        },
+        {
+            "dataFileId": 1,
+            "dataType": {
+                "dataTypeId": 1,
+                "name": "MS",
+                "description": "Mass spectrometry data file.",
+                "url": null
+            },
+            "origFileName": "MP-hStem10stdfrag12-2_120503120725.raw",
+            "description": "Instrument file for the Tandem MS N-Glycan Run"
+        },
+        {
+            "dataFileId": 5,
+            "dataType": {
+                "dataTypeId": 5,
+                "name": "MS Annotation",
+                "description": "Datafile with the annotation of an MS experiment",
+                "url": null
+            },
+            "origFileName": "MP-hStem10std-SimGlycan.csv",
+            "description": "SimGlycan annotaiton of the MS run"
+        },
+        {
+            "dataFileId": 4,
+            "dataType": {
+                "dataTypeId": 5,
+                "name": "MS Annotation",
+                "description": "Datafile with the annotation of an MS experiment",
+                "url": null
+            },
+            "origFileName": "MP-hStem10std-GRITS-annotation.zip",
+            "description": "GRITS Toolbox annotation of the MS run"
+        }
+    ]
+}

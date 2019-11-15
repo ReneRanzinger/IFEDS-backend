@@ -1,0 +1,44 @@
+[
+    {
+        "datasetId": 1,
+        "datasetName": "Stem Cell Dataset for Infrasturucture of Experimental Data Analysis 1",
+        "sampleName": "Differenciated smooth muscle cell",
+        "providerName": "CCRC1",
+        "description": "Glycomics analysis performed with the stem cell data set 1- comprehensive study of glycomes including genetic, physiologic, pathologic, and other aspects"
+    },
+    {
+        "datasetId": 3,
+        "datasetName": "Hair Data 3",
+        "sampleName": "Hair - Used by forensic teams for investigation",
+        "providerName": "CCRC1",
+        "description": "Hair analysis performed with the hair data set 3- Hair analysis may refer to the chemical analysis of a hair sample, but can also refer to microscopic analysis or comparison. Chemical hair analysis may be considered for retrospective purposes when blood and urine are no longer expected to contain a particular contaminant, typically three months or less."
+    },
+    {
+        "datasetId": 4,
+        "datasetName": "Stem Cell Data 4",
+        "sampleName": "Differenciated smooth muscle cell",
+        "providerName": "CCRC2",
+        "description": "Glycomics analysis performed with the stem cell data set 4."
+    },
+    {
+        "datasetId": 5,
+        "datasetName": "Stem Cell Data 5",
+        "sampleName": "Differenciated smooth muscle cell",
+        "providerName": "CCRC2",
+        "description": "Glycomics analysis performed with the stem cell data set 5."
+    },
+    {
+        "datasetId": 6,
+        "datasetName": "Hair Data 6",
+        "sampleName": "Hair - Used by forensic teams for investigation",
+        "providerName": "CCRC2",
+        "description": "Hair analysis performed with the hair data set 6."
+    },
+    {
+        "datasetId": 7,
+        "datasetName": "Stem Cell Data 7",
+        "sampleName": "Differenciated smooth muscle cell",
+        "providerName": "aaaaaaaaaabbbbbbbbbbbbbbbb",
+        "description": "Glycomics analysis performed with the stem cell data set 7."
+    }
+]
