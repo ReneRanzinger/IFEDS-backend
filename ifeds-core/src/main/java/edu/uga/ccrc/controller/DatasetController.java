@@ -39,7 +39,13 @@ import edu.uga.ccrc.view.bean.DatasetToExperimentTypeBean;
 import edu.uga.ccrc.view.bean.FundingGrantBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 
+
+@Api(value="ifeds", description="Operations pertaining to dataset")
 @RestController
 public class DatasetController {
 
@@ -52,6 +58,13 @@ public class DatasetController {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
+	@ApiOperation(value = "View a list of available datasets", response = List.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Success"),
+	        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+	    })
 	@CrossOrigin
 	@GetMapping(value = "/datasets", produces = "application/json")
 	public List<DatasetBean> getAllDatasets(HttpServletRequest request) {
@@ -100,6 +113,7 @@ public class DatasetController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/datasets/{id}", produces = "application/json")
+	@ApiOperation(value = "Delete a dataset")
 	public void deleteDataset(@PathVariable long id) {
 		System.out.println("Deleting datasets : deleteDataset() id : " + id);
 		datasetDAO.deleteById(id);
@@ -107,6 +121,13 @@ public class DatasetController {
 
 	@CrossOrigin
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
+	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Success"),
+	        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+	    })
 	// http://localhost:8080/datasetDetail/1;
 	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) {
 
