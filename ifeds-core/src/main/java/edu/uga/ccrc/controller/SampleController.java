@@ -159,8 +159,9 @@ public class SampleController {
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")
 	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) {
 		
+		System.out.println("In update Sample : ");
 		
-		
+	
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		
@@ -174,18 +175,46 @@ public class SampleController {
 		
 		
 		//create sample	
-		try{
-			sample = sampleDAO.findById(id).orElseThrow(() -> new ResolutionException("id : " + id));
-			sample.setProvider(owner);
-			sample.setName(sampleHelperBean.getName());
-			sample.setSampleType(sampleType);
-			sample.setUrl(sampleHelperBean.getUrl());
-			sample.setDescription(sampleHelperBean.getDescription());
-			Sample saved = sampleDAO.save(sample);
-			return "message : Sample Updated : " + id;
+		try{	
+		sample = sampleDAO.findById(id).orElseThrow(() -> new ResolutionException("id : " + id));
+		sample.setProvider(owner);
+		sample.setName(sampleHelperBean.getName());
+		sample.setSampleType(sampleType);
+		sample.setUrl(sampleHelperBean.getUrl());
+		sample.setDescription(sampleHelperBean.getDescription());
+		Sample saved = sampleDAO.save(sample);
+		
+		//add sample descriptor
+		
+		for(CreateSampleToSampleDescriptorHelperBean descriptor : sampleHelperBean.getSample_descriptors()) {
 			
-		}catch(Exception e) {
-			return "message : Id not found";
+			//1) Create composite Primary key
+			SampleToSampleDescriptorPK sampleToSampleDescPK = new SampleToSampleDescriptorPK(saved.getSampleId(),descriptor.getSample_descriptor_id(),descriptor.getSample_descriptor_value());
+			
+			//2) Create SampleToSampleDescriptor object
+			SampleToSampleDescriptor sampleToSampleDescriptor = new SampleToSampleDescriptor();
+			
+			//3) Get Sample Descriptor
+			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
+			
+			
+			//4) Set all entries
+			sampleToSampleDescriptor.setSampleToSampleDescPK(sampleToSampleDescPK);	
+			sampleToSampleDescriptor.setSample(saved);
+			sampleToSampleDescriptor.setSampleDescriptor(sampleDescriptor);
+			sampleToSampleDescriptor.setUnitOfMeasurement(descriptor.getUnit_of_measurment());
+			
+			//5) Save
+			SampleToSampleDescriptor savedEntry = sampleToSampleDescriptorDAO.save(sampleToSampleDescriptor);
+			
+
+		}
+		return "message : Sample Updated : " + id;
+
+			
+		}
+		catch(Exception e) {
+			return  "{\n\tmessage: Something went wrong. Please try again after sometime}" + e.getMessage() ;
 			
 		}
 		
