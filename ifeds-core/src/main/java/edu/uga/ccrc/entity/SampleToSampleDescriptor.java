@@ -28,7 +28,7 @@ public class SampleToSampleDescriptor {
 	@Column(name="unit_of_measurement", length=256)
 	private String unitOfMeasurement;
 	
-	protected SampleToSampleDescriptor() {}
+	public SampleToSampleDescriptor() {}
 
 	public SampleToSampleDescriptorPK getSampleToSampleDescPK() {
 		return sampleToSampleDescPK;

@@ -14,6 +14,7 @@ public interface SampleDescriptorDAO extends CrudRepository<SampleDescriptor, Lo
 
 	public List<SampleDescriptor> findAll();
 	
-	@Query(value="SELECT * FROM core.sample_descriptor where sample_type_id = ?1",nativeQuery=true)
+	@Query(value="SELECT * FROM core.sample_descriptor where sample_descriptor_id = ?1",nativeQuery=true)
 	SampleDescriptor findSampleDescriptorById(Long sampleSampleDescriptorId);
+	
 }

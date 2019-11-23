@@ -1,6 +1,7 @@
 package edu.uga.ccrc.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,6 +19,10 @@ public interface SampleDAO extends CrudRepository<Sample, Long> {
 	 public Sample save(Sample newSample);
 	 
 	 void deleteById(Long id);
+	 
+	 public Optional<Sample> findById(Long id);
+	 
+	 
 	
 }
 

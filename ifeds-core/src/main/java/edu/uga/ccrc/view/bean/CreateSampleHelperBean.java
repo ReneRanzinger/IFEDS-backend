@@ -2,6 +2,8 @@ package edu.uga.ccrc.view.bean;
 
 import java.util.List;
 
+import edu.uga.ccrc.entity.SampleDescriptor;
+
 public class CreateSampleHelperBean {
 	
 	
@@ -9,7 +11,7 @@ public class CreateSampleHelperBean {
 	
 	private Long sample_type_id;
 	
-    private List<Long> sample_descriptor_id;
+    private List<CreateSampleToSampleDescriptorHelperBean> sample_descriptors;
     
 	private String name;
 	
@@ -48,16 +50,7 @@ public class CreateSampleHelperBean {
 	/**
 	 * @return the sample_descriptor_id
 	 */
-	public List<Long> getSample_descriptor_id() {
-		return sample_descriptor_id;
-	}
 
-	/**
-	 * @param sample_descriptor_id the sample_descriptor_id to set
-	 */
-	public void setSample_descriptor_id(List<Long> sample_descriptor_id) {
-		this.sample_descriptor_id = sample_descriptor_id;
-	}
 
 	/**
 	 * @return the name
@@ -101,12 +94,20 @@ public class CreateSampleHelperBean {
 		this.url = url;
 	}
 
-	@Override
-	public String toString() {
-		return "CreateSampleBeanHelper [sampleId=" + sampleId + ", sample_type_id=" + sample_type_id
-				+ ", sample_descriptor_id=" + sample_descriptor_id + ", name=" + name + ", description=" + description
-				+ ", url=" + url + "]";
+	public List<CreateSampleToSampleDescriptorHelperBean> getSample_descriptors() {
+		return sample_descriptors;
 	}
-    
+
+	public void setSample_descriptors(List<CreateSampleToSampleDescriptorHelperBean> sample_descriptors) {
+		System.out.println("In ser : "+sample_descriptors.toString());
+		this.sample_descriptors = sample_descriptors;
+	}
+
+
+
+	/**
+	 * @return the sample_descriptors
+	 */
+
 
 }
