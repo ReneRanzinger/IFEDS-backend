@@ -1,6 +1,6 @@
 package edu.uga.ccrc.controller;
 
-import java.lang.module.ResolutionException;
+//import java.lang.module.ResolutionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +119,7 @@ public class SampleController {
 		newSample.setDescription(sampleHelperBean.getDescription());
 		Sample saved = sampleDAO.save(newSample);
 		savedSampleId = saved.getSampleId();			
+		
 		//create entry in sampleToSampleDescriptors
 		//sample descriptors are stored by Ids in the List of Longs
 		//need to save same descriptors one by one from the list
@@ -176,7 +177,10 @@ public class SampleController {
 		
 		//create sample	
 		try{	
-		sample = sampleDAO.findById(id).orElseThrow(() -> new ResolutionException("id : " + id));
+		sample = sampleDAO.findById(id).orElse(null);
+		if(sample == null)
+			return  "{\n\tmessage: Something went wrong. Please try again after sometime}";
+		
 		sample.setProvider(owner);
 		sample.setName(sampleHelperBean.getName());
 		sample.setSampleType(sampleType);
