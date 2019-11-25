@@ -56,16 +56,17 @@ public class SampleBean{
 		this.url = url;
 	}
 
-	@Override
-	public String toString() {
-		return "SampleBean [sampleId=" + sampleId + ", name=" + name + ", description=" + description + ", url=" + url + "]";
-	}
-
 	public Long getSample_type_id() {
 		return sampleTypeId;
 	}
 
 	public void setSample_type_id(Long sample_type_id) {
 		this.sampleTypeId = sample_type_id;
+	}
+
+	@Override
+	public String toString() {
+		return "SampleBean [sampleId=" + sampleId + ", sampleTypeId=" + sampleTypeId + ", name=" + name
+				+ ", description=" + description + ", url=" + url + "]";
 	}
 }

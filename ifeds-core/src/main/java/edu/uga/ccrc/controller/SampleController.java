@@ -228,9 +228,9 @@ public class SampleController {
 	
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/samples/{id}", produces="application/json")
-	public List<String> deleteDataset(@PathVariable Long id) {
+	public List<String> deleteSample(@PathVariable Long id) {
 		List<String> res = new ArrayList<>();
-		System.out.println("Deleting datasets : deleteDataset() id : " + id);
+		System.out.println("Deleting Sample : deleteSample() id : " + id);
 		sampleDAO.deleteById(id);
 		res.add("success");	
 			
