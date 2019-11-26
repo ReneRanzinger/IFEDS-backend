@@ -24,7 +24,7 @@ public class FundingGrant {
     @JoinColumn(name = "funding_source_id")
     FundingSource fundingSource;
 	
-	protected FundingGrant() {}
+	public FundingGrant() {}
 
 	public FundingGrantPK getFundingGrantPK() {
 		return fundingGrantPK;

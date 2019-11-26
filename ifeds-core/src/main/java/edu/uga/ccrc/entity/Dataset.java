@@ -53,7 +53,7 @@ public class Dataset {
 	@OneToMany(mappedBy = "dataset")
     Set<DataFile> dataFiles;
 
-	protected Dataset() {}
+	public Dataset() {}
 
 	public Long getDatasetId() {
 		return datasetId;

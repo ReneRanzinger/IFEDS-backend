@@ -7,8 +7,15 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class DatasetToExperimentTypePK implements Serializable{
-	
+
 	private static final long serialVersionUID = -781291215757310907L;
+
+	public DatasetToExperimentTypePK() {}
+	
+	public DatasetToExperimentTypePK(Long datasetId, Long experimentTypeId) {
+		this.datasetId = datasetId;
+		this.experimentTypeId = experimentTypeId;
+	}
 
 	@Column(name="dataset_id")
 	Long datasetId;

@@ -8,6 +8,14 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class FundingGrantPK implements Serializable{
 
+	public FundingGrantPK() {};
+	public FundingGrantPK(Long datasetId, Long fundingSourceId, String grantNumber) {
+	
+		this.datasetId = datasetId;
+		this.fundingSourceId = fundingSourceId;
+		this.grantNumber = grantNumber;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Column(name="dataset_id")

@@ -28,7 +28,7 @@ public class DatasetToExperimentType {
 	@Column(length=1000)
 	private String description;
 	
-	protected DatasetToExperimentType() {}
+	public DatasetToExperimentType() {}
 
 	public DatasetToExperimentTypePK getDatasetToExperimentTypePK() {
 		return datasetToExperimentTypePK;

@@ -24,7 +24,7 @@ public class DatasetToKeyword {
     @JoinColumn(name = "keyword_id")
     Keyword keyword;
 	
-	protected DatasetToKeyword() {}
+	public DatasetToKeyword() {}
 
 	public DatasetToKeywordPK getDatasetToKeywordPK() {
 		return datasetToKeywordPK;

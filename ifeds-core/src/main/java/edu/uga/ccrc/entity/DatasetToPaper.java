@@ -24,7 +24,7 @@ public class DatasetToPaper {
     @JoinColumn(name = "paper_id")
     Paper paper;
 	
-	protected DatasetToPaper() {}
+	public DatasetToPaper() {}
 
 	public DatasetToPaperPK getDatasetToPaperPK() {
 		return datasetToPaperPK;

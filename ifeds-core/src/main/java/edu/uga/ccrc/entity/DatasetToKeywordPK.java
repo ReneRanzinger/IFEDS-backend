@@ -8,6 +8,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DatasetToKeywordPK implements Serializable{
 	
+	public DatasetToKeywordPK() {}
+	
+	public DatasetToKeywordPK(Long datasetId, Long keywordId) {
+		this.datasetId = datasetId;
+		this.keywordId = keywordId;
+	}
+
 	private static final long serialVersionUID = 1140311804249672947L;
 
 	@Column(name="dataset_id")

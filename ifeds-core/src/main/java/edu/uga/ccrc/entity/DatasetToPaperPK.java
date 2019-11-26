@@ -8,6 +8,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DatasetToPaperPK implements Serializable{
 	
+	public DatasetToPaperPK() {}
+	public DatasetToPaperPK(Long datasetId, Long paperId) {
+		
+		this.datasetId = datasetId;
+		this.paperId = paperId;
+	}
+
 	private static final long serialVersionUID = 4852968480156595611L;
 
 	@Column(name="dataset_id")

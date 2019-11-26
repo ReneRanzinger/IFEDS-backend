@@ -179,7 +179,7 @@ public class SampleController {
 		try{	
 		sample = sampleDAO.findById(id).orElse(null);
 		if(sample == null)
-			return  "{\n\tmessage: Something went wrong. Please try again after sometime}";
+			return  "{\n\tmessage: Sample Doesn't exist}";
 		
 		sample.setProvider(owner);
 		sample.setName(sampleHelperBean.getName());
