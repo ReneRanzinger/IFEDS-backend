@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,8 @@ import edu.uga.ccrc.entity.Keyword;
 import edu.uga.ccrc.entity.Paper;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.entity.Sample;
+import edu.uga.ccrc.exception.EntityNotFoundException;
+import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.view.bean.DataFileBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DatasetDetailBean;
@@ -44,8 +47,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 
-
-@Api(value="ifeds", description="Operations pertaining to dataset")
+@Api(value = "ifeds", description = "Operations pertaining to dataset")
 @RestController
 public class DatasetController {
 
@@ -59,14 +61,13 @@ public class DatasetController {
 	private JwtTokenUtil jwtTokenUtil;
 
 	@ApiOperation(value = "View a list of available datasets", response = List.class)
-	@ApiResponses(value = {
-	        @ApiResponse(code = 200, message = "Success"),
-	        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
-	    })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
+			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	@CrossOrigin
 	@GetMapping(value = "/datasets", produces = "application/json")
+	// http://localhost:8080/datasets
 	public List<DatasetBean> getAllDatasets(HttpServletRequest request) {
 
 		System.out.println("Retrieving datasets : getAllDatasets() ");
@@ -122,13 +123,11 @@ public class DatasetController {
 	@CrossOrigin
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
 	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
-	@ApiResponses(value = {
-	        @ApiResponse(code = 200, message = "Success"),
-	        @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
-	    })
-	// http://localhost:8080/datasetDetail/1;
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
+			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+	// http://localhost:8080/dataset/1;
 	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) {
 
 		System.out.println("Retrieving dataset detail : getDatasetDetail() ");
@@ -141,11 +140,16 @@ public class DatasetController {
 		// If there is no token header, display dataset detail only if dataset is public
 		if (requestTokenHeader == null) {
 			System.out.println("Get dataset detail " + datasetId);
-			for (Dataset ds : datasetDAO.findByDatasetId(datasetId)) {
-				if (ds.isPublic())
-					b = populateDatasetDetailBean(b, ds);
+			Optional<Dataset> ds = datasetDAO.findById(datasetId);
+			
+			//Throw EntityNotFoundException if ds is null
+			if (!ds.isPresent()) {
+				throw new EntityNotFoundException("The dataset resource with id "+datasetId+" is not found");
+			} else {
+				if (ds.get().isPublic())
+					b = populateDatasetDetailBean(b, ds.get());
 				else
-					System.out.println("Dataset cannot be accessed without authorization");
+					throw new ForbiddenException("Accessing the dataset with id "+datasetId+" is forbidden");
 			}
 		} else {
 			System.out.println("Token header present");
@@ -154,17 +158,21 @@ public class DatasetController {
 			String jwtToken = requestTokenHeader.substring(7);
 			String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 			Provider provider = providerDao.findByUsername(username);
-
+			
 			System.out.println("Provider id :" + provider.getProviderId() + " " + "Dataset id :" + datasetId);
 
-			// Allow provider to view dataset detail if he's the owner
-			Iterator<Dataset> dsIter = datasetDAO.checkforProviderDataset(datasetId, provider.getProviderId())
+			// Allow provider to view dataset detail if he's the owner or if the dataset is public
+			Iterator<Dataset> dsIter = datasetDAO.findPublicOrProviderDataset(datasetId, provider.getProviderId())
 					.iterator();
 			if (dsIter.hasNext()) {
 				b = populateDatasetDetailBean(b, dsIter.next());
 			} else {
-				// Else unauthorized to view the dataset
-				System.out.println("Dataset cannot be accessed without authorization");
+				Optional<Dataset> ds = datasetDAO.findById(datasetId);
+				if (!ds.isPresent()) {
+					throw new EntityNotFoundException("The dataset resource with id "+datasetId+" is not found");
+				} else {
+					throw new ForbiddenException("Accessing the dataset with id "+datasetId+" is forbidden");
+				}
 			}
 		}
 		return b;
