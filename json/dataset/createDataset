@@ -18,7 +18,7 @@
     	}
     	
     	],
-    "funding_sources" :[
+    "funding_grant" :[
     		{
     			"funding_source_id" : 1,
     			"grant_number" : "12CX",
