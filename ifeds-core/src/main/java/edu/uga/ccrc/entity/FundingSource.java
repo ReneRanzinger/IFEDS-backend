@@ -21,6 +21,7 @@ public class FundingSource {
 	
 	@Column(length=16)
 	private String abbreviation;
+	
 		
 	@Column(length=256)
 	private String url;

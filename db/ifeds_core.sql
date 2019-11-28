@@ -141,5 +141,6 @@ CREATE TABLE core.funding_grant
 	dataset_id integer REFERENCES core.dataset ON UPDATE CASCADE ON DELETE CASCADE,
 	funding_source_id integer REFERENCES core.funding_source ON UPDATE CASCADE ON DELETE CASCADE,
 	grant_number varchar(64) NOT NULL,
+	url VARCHAR(256),
 	PRIMARY KEY(dataset_id, funding_source_id,grant_number)
 );

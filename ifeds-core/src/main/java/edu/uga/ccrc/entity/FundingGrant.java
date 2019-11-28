@@ -1,5 +1,6 @@
 package edu.uga.ccrc.entity;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -23,6 +24,9 @@ public class FundingGrant {
     @MapsId("funding_source_id")
     @JoinColumn(name = "funding_source_id")
     FundingSource fundingSource;
+    
+    @Column(length=256)
+	private String url;
 	
 	public FundingGrant() {}
 
@@ -48,5 +52,13 @@ public class FundingGrant {
 
 	public void setFundingSource(FundingSource fundingSource) {
 		this.fundingSource = fundingSource;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

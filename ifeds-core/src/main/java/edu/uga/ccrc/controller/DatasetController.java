@@ -28,6 +28,8 @@ import edu.uga.ccrc.dao.DatasetToExperimentTypeDAO;
 import edu.uga.ccrc.dao.DatasetToKeywordDAO;
 import edu.uga.ccrc.dao.DatasetToPaperDAO;
 import edu.uga.ccrc.dao.ExperimentTypeDAO;
+import edu.uga.ccrc.dao.FundingGrantDAO;
+import edu.uga.ccrc.dao.FundingSourceDAO;
 import edu.uga.ccrc.dao.KeywordDAO;
 import edu.uga.ccrc.dao.PaperDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
@@ -42,6 +44,8 @@ import edu.uga.ccrc.entity.DatasetToPaper;
 import edu.uga.ccrc.entity.DatasetToPaperPK;
 import edu.uga.ccrc.entity.ExperimentType;
 import edu.uga.ccrc.entity.FundingGrant;
+import edu.uga.ccrc.entity.FundingGrantPK;
+import edu.uga.ccrc.entity.FundingSource;
 import edu.uga.ccrc.entity.Keyword;
 import edu.uga.ccrc.entity.Paper;
 import edu.uga.ccrc.entity.Provider;
@@ -60,6 +64,7 @@ import edu.uga.ccrc.view.bean.ProviderBean;
 import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
 import edu.uga.ccrc.view.bean.DatasetBeans.CreateDatasetHelperBean;
 import edu.uga.ccrc.view.bean.DatasetBeans.CreateDatasetToExperimentTypeHelperBean;
+import edu.uga.ccrc.view.bean.DatasetBeans.CreateFundingGrantHelperBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
@@ -95,6 +100,12 @@ public class DatasetController {
 	
 	@Autowired
 	PaperDAO paperDAO;
+	
+	@Autowired
+	FundingGrantDAO fundingGrantDAO;
+	
+	@Autowired
+	FundingSourceDAO fundingSourcetDAO;
 	
 	
 	@Autowired
@@ -324,9 +335,28 @@ public class DatasetController {
 		
 		//2)Save dataset-to-funding-grant 
 		
-		for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
+		for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
 			
+			//create composite PK
+			FundingGrantPK fundingGrantPK = new FundingGrantPK(dataset.getDatasetId(), fundGrant.getFunding_source_id(), fundGrant.getGrant_number());
 			
+			//create m-n object
+			FundingGrant fundingGrant = new FundingGrant();
+			
+			//find funding source
+			FundingSource fundingSource = fundingSourcetDAO.findById(fundGrant.getFunding_source_id()).orElse(null);
+			
+			if(fundingSource == null) {
+				datasetDAO.deleteById(dataset.getDatasetId());
+				return "{\n\tError : Funding Source doesn't exists}";
+			}
+			
+			fundingGrant.setDataset(dataset);
+			fundingGrant.setFundingGrantPK(fundingGrantPK);
+			fundingGrant.setFundingSource(fundingSource);
+			fundingGrant.setUrl(fundGrant.getUrl());
+			
+			fundingGrant = fundingGrantDAO.save(fundingGrant);
 			
 		}
 		
@@ -339,7 +369,11 @@ public class DatasetController {
 			//get experiment type
 			ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
 			
-			if(experimentType == null) return "{\n\tError : Experiment Type doesn't exists}";
+			if(experimentType == null) {
+				System.out.println("deleteing dataset" + dataset.getDatasetId());
+				datasetDAO.deleteById(dataset.getDatasetId());
+				return "{\n\tError : Experiment Type doesn't exists}";
+			}
 			
 			//build composite PK
 			DatasetToExperimentTypePK datasetToExperimentTypePK = new DatasetToExperimentTypePK(dataset.getDatasetId(), experimentType.getExperimentTypeId());
@@ -362,7 +396,10 @@ public class DatasetController {
 			
 			//get keyword
 			Keyword keyword = keywordDAO.findById(keyWordId).orElse(null);
-			if(keyword == null) return "{\n\tError : keyword doesn't exists}";
+			if(keyword == null) {
+				datasetDAO.deleteById(dataset.getDatasetId());
+				return "{\n\tError : keyword doesn't exists}";
+			}
 			
 			//build compositePk
 			DatasetToKeywordPK datasetToKeywordPK = new DatasetToKeywordPK(dataset.getDatasetId(), keyword.getKeywordId());
@@ -384,7 +421,10 @@ public class DatasetController {
 			
 			//get Paper
 			Paper paper = paperDAO.findById(paperId).orElse(null);
-			if(paper == null)return "{\n\tError : Paper doesn't exists}";
+			if(paper == null) {
+				datasetDAO.deleteById(dataset.getDatasetId());
+				return "{\n\tError : Paper doesn't exists}";
+			}
 			
 			//build composite PK
 			DatasetToPaperPK datasetToPaperPK = new DatasetToPaperPK(dataset.getDatasetId(), paper.getPaperId());

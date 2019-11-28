@@ -14,7 +14,7 @@ public class CreateDatasetHelperBean {
 	
 	List<CreateDatasetToExperimentTypeHelperBean> experiment_types;
 	
-	List<CreateFundingGrantHelperBean> funding_sources;
+	List<CreateFundingGrantHelperBean> funding_grant;
 	
 	List<Long> keywordsIds;
 	
@@ -45,12 +45,12 @@ public class CreateDatasetHelperBean {
 		this.experiment_types = experiment_types;
 	}
 
-	public List<CreateFundingGrantHelperBean> getFunding_sources() {
-		return funding_sources;
+	public List<CreateFundingGrantHelperBean> getFunding_grant() {
+		return funding_grant;
 	}
 
-	public void setFunding_sources(List<CreateFundingGrantHelperBean> funding_sources) {
-		this.funding_sources = funding_sources;
+	public void setFunding_grant(List<CreateFundingGrantHelperBean> funding_sources) {
+		this.funding_grant = funding_sources;
 	}
 
 	public List<Long> getKeywordsIds() {
@@ -84,7 +84,7 @@ public class CreateDatasetHelperBean {
 	@Override
 	public String toString() {
 		return "CreateDatasetHelperBean [datasetName=" + datasetName + ", description=" + description + ", sampleIds="
-				+ sampleIds + ", experiment_types=" + experiment_types + ", funding_sources=" + funding_sources
+				+ sampleIds + ", experiment_types=" + experiment_types + ", funding_sources=" + funding_grant
 				+ ", keywordsIds=" + keywordsIds + ", paperIds=" + paperIds + "]";
 	}
 
