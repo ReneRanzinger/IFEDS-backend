@@ -1,0 +1,41 @@
+{
+
+"datasetName": "Stem asdsadCeleraerewrqwewqswqeweaq3esdsaddasasdsaeasdasdrl wereqrewDataset for Infrasturucture of Experimental Data Analysis 1",
+    "description": "Glycomierecs analysis performed with the stem cell data set 1- comprehensive study of glycomes including genetic, physiologic, pathologic, and ewrewrewrother aspects",
+    "sampleIds": 41,
+    "is_public": true,
+    "experiment_types":[
+    	{
+    		"experiment_type_id" : 1,
+    		"description" : "example"
+    		
+    		
+    	},
+    	{
+    		"experiment_type_id" : 2,
+    		"description" : "example2"
+    		
+    	}
+    	
+    	],
+    "funding_sources" :[
+    		{
+    			"funding_source_id" : 1,
+    			"grant_number" : "12CX",
+    			"url" : "google.com"
+    			
+    			
+    		},
+    		{
+    			"funding_source_id" : 2,
+    			"grant_number" : "12CASX",
+    			"url" : "google.com"
+    			
+    			
+    		}
+    		
+    ],
+    "keywordsIds":[1, 2],
+    "paperIds" : [1, 2]
+   
+}
