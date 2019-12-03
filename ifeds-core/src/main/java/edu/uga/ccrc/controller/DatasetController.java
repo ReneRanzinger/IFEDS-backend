@@ -445,4 +445,132 @@ public class DatasetController {
 	
 	}
 	
+	@RequestMapping(method = RequestMethod.PUT, value = "/datasets/{id}", produces="application/json")
+	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) {
+		
+		System.out.println("In update dataset : ");
+		Dataset dataset = datasetDAO.findById(id).orElse(null);
+		if(dataset == null) {
+			
+			new EntityNotFoundException("Not found");
+			return null;
+		}
+		dataset.setDescription(createDatasetHelperBean.getDescription());
+		
+		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
+
+		dataset = datasetDAO.save(dataset);
+		
+		//2)Save dataset-to-funding-grant 
+		
+				for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
+					
+					//create composite PK
+					FundingGrantPK fundingGrantPK = new FundingGrantPK(dataset.getDatasetId(), fundGrant.getFunding_source_id(), fundGrant.getGrant_number());
+					
+					//create m-n object
+					FundingGrant fundingGrant = new FundingGrant();
+					
+					//find funding source
+					FundingSource fundingSource = fundingSourcetDAO.findById(fundGrant.getFunding_source_id()).orElse(null);
+					
+					if(fundingSource == null) {
+						datasetDAO.deleteById(dataset.getDatasetId());
+						return "{\n\tError : Funding Source doesn't exists}";
+					}
+					
+					fundingGrant.setDataset(dataset);
+					fundingGrant.setFundingGrantPK(fundingGrantPK);
+					fundingGrant.setFundingSource(fundingSource);
+					fundingGrant.setUrl(fundGrant.getUrl());
+					
+					fundingGrant = fundingGrantDAO.save(fundingGrant);
+					
+				}
+				
+				
+				
+				//3)Save dataset-to-experimentType
+				
+				for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
+					
+					//get experiment type
+					ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
+					
+					if(experimentType == null) {
+						System.out.println("deleteing dataset" + dataset.getDatasetId());
+						datasetDAO.deleteById(dataset.getDatasetId());
+						return "{\n\tError : Experiment Type doesn't exists}";
+					}
+					
+					//build composite PK
+					DatasetToExperimentTypePK datasetToExperimentTypePK = new DatasetToExperimentTypePK(dataset.getDatasetId(), experimentType.getExperimentTypeId());
+					
+					//create object for m-n entry
+					DatasetToExperimentType datasetToExperimentType = new DatasetToExperimentType();
+					
+					datasetToExperimentType.setDataset(dataset);
+					datasetToExperimentType.setDatasetToExperimentTypePK(datasetToExperimentTypePK);
+					datasetToExperimentType.setExperimentType(experimentType);
+					datasetToExperimentType.setDescription(expTypeIdAndDes.getDescription());
+					datasetToExperimentType = datasetToExperimentTypeDAO.save(datasetToExperimentType);
+					
+				}
+				
+				//build composite pk
+				
+				//4)Save dataset-to-keyWords
+				for(Long keyWordId :createDatasetHelperBean.getKeywordsIds()) {
+					
+					//get keyword
+					Keyword keyword = keywordDAO.findById(keyWordId).orElse(null);
+					if(keyword == null) {
+						datasetDAO.deleteById(dataset.getDatasetId());
+						return "{\n\tError : keyword doesn't exists}";
+					}
+					
+					//build compositePk
+					DatasetToKeywordPK datasetToKeywordPK = new DatasetToKeywordPK(dataset.getDatasetId(), keyword.getKeywordId());
+					
+					//create object for m-n entry
+					DatasetToKeyword datasetToKeyword = new DatasetToKeyword();
+					
+					datasetToKeyword.setDataset(dataset);
+					datasetToKeyword.setDatasetToKeywordPK(datasetToKeywordPK);
+					datasetToKeyword.setKeyword(keyword);
+					
+					datasetToKeyword = datasetToKeywordDAO.save(datasetToKeyword);
+					
+				}
+				
+				
+				//5)Save dataset-to-paper
+				for(Long paperId : createDatasetHelperBean.getPaperIds()) {
+					
+					//get Paper
+					Paper paper = paperDAO.findById(paperId).orElse(null);
+					if(paper == null) {
+						datasetDAO.deleteById(dataset.getDatasetId());
+						return "{\n\tError : Paper doesn't exists}";
+					}
+					
+					//build composite PK
+					DatasetToPaperPK datasetToPaperPK = new DatasetToPaperPK(dataset.getDatasetId(), paper.getPaperId());
+					
+					//create object for m-n entry
+					DatasetToPaper datasetToPaper = new DatasetToPaper();
+					
+					datasetToPaper.setDataset(dataset);
+					datasetToPaper.setDatasetToPaperPK(datasetToPaperPK);
+					datasetToPaper.setPaper(paper);
+					
+					datasetToPaper = datasetToPaperDAO.save(datasetToPaper);
+					
+				}
+				
+				return "{\n\t Updated Dataset with id : " + dataset.getDatasetId() + "}";
+				
+		
+	}
+	
 }
