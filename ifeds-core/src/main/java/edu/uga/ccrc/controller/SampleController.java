@@ -189,6 +189,8 @@ public class SampleController {
 		Sample saved = sampleDAO.save(sample);
 		
 		//add sample descriptor
+		//flush all sameToSampleDescriptor entries
+		sampleToSampleDescriptorDAO.deleteSampleToSampleDescriptorBySampleId(id);
 		
 		for(CreateSampleToSampleDescriptorHelperBean descriptor : sampleHelperBean.getSample_descriptors()) {
 			
