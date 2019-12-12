@@ -461,8 +461,8 @@ public class DatasetController {
 
 		dataset = datasetDAO.save(dataset);
 		
-		//2)Save dataset-to-funding-grant 
-		
+				fundingGrantDAO.deleteFundingGrantByDatasetId(id);
+				//2)Save dataset-to-funding-grant 
 				for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
 					
 					//create composite PK
@@ -489,9 +489,8 @@ public class DatasetController {
 				}
 				
 				
-				
+				datasetToExperimentTypeDAO.deleteDatasetToExperimentTypeByDatasetId(id);
 				//3)Save dataset-to-experimentType
-				
 				for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
 					
 					//get experiment type
@@ -520,6 +519,7 @@ public class DatasetController {
 				//build composite pk
 				
 				//4)Save dataset-to-keyWords
+				datasetToKeywordDAO.deleteDatasetToKeywordByDatasetId(id);
 				for(Long keyWordId :createDatasetHelperBean.getKeywordsIds()) {
 					
 					//get keyword
@@ -545,6 +545,7 @@ public class DatasetController {
 				
 				
 				//5)Save dataset-to-paper
+				datasetToPaperDAO.deleteDatasetToPaperByDatasetId(id);
 				for(Long paperId : createDatasetHelperBean.getPaperIds()) {
 					
 					//get Paper
