@@ -6,10 +6,10 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.9.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<version>2.1.10.RELEASE</version>
+		<relativePath />
 	</parent>
-	<groupId>edu.uga.ccrc</groupId>
+	<groupId>edu.uga.ccrc</groupId> 
 	<artifactId>ifeds-core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ifeds-core</name>
@@ -17,6 +17,8 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+               <!-- The main class to start by executing "java -jar" -->
+               <start-class>edu.uga.ccrc.IfedsCoreApplication</start-class>
 	</properties>
 
 	<dependencies>
