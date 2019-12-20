@@ -1,21 +1,15 @@
-#FROM maven:latest-onbuild
-
-#FROM openjdk:latest
-#EXPOSE 8080
-#VOLUME /tmp
-#COPY --from=0 target/ifeds-core:0.0.1-SNAPSHOT.jar spring-boot-docker.jar
-#ADD target/spring-boot-docker.jar spring-boot-docker.jar
-#ENTRYPOINT ["java","-jar","/spring-boot-docker.jar"]
+FROM alpine/git as clone 
+WORKDIR /app
+RUN git clone https://github.com/ReneRanzinger/IFEDS-backend.git
 
 FROM maven:3.5-jdk-8-alpine as build
 
 WORKDIR /app
-ADD pom.xml /app
+COPY --from=clone app/IFEDS-backend/ifeds-core/pom.xml /app
 RUN mvn verify clean --fail-never
 
 # Image layer: with the application
-COPY . /app
-RUN mvn -v
+COPY --from=clone app/IFEDS-backend /app
 RUN mvn clean install -DskipTests
 
 FROM openjdk:8-alpine
