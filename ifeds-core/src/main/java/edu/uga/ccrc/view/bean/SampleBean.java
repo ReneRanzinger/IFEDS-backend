@@ -6,6 +6,8 @@ public class SampleBean{
 	
 	private Long sampleId;
 	
+	private String sampleTypeName;
+	
 	private Long sampleTypeId;
 	
 	private String name;
@@ -68,5 +70,21 @@ public class SampleBean{
 	public String toString() {
 		return "SampleBean [sampleId=" + sampleId + ", sampleTypeId=" + sampleTypeId + ", name=" + name
 				+ ", description=" + description + ", url=" + url + "]";
+	}
+
+	public String getSampleTypeName() {
+		return sampleTypeName;
+	}
+
+	public void setSampleTypeName(String sampleTypeName) {
+		this.sampleTypeName = sampleTypeName;
+	}
+
+	public Long getSampleTypeId() {
+		return sampleTypeId;
+	}
+
+	public void setSampleTypeId(Long sampleTypeId) {
+		this.sampleTypeId = sampleTypeId;
 	}
 }

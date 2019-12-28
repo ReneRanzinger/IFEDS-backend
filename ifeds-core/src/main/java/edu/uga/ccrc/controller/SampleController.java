@@ -80,6 +80,7 @@ public class SampleController {
 			
 			sampleBean.setSampleId(sample.getSampleId());
 			sampleBean.setSample_type_id(sample.getSampleType().getSampleTypeId());
+			sampleBean.setSampleTypeName(sample.getSampleType().getName());
 			sampleBean.setUrl(sample.getUrl());
 			sampleBean.setName(sample.getName());
 			sampleBean.setDescription(sample.getDescription());
