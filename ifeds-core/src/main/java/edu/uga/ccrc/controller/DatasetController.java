@@ -1,6 +1,4 @@
-/**
- * @author Susan George
- */
+
 package edu.uga.ccrc.controller;
 
 import java.util.ArrayList;

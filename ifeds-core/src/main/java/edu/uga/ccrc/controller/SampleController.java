@@ -79,11 +79,12 @@ public class SampleController {
 			SampleBean sampleBean = new SampleBean();
 			
 			sampleBean.setSampleId(sample.getSampleId());
-			sampleBean.setSample_type_id(sample.getSampleType().getSampleTypeId());
+			sampleBean.setSampleTypeId(sample.getSampleType().getSampleTypeId());
 			sampleBean.setSampleTypeName(sample.getSampleType().getName());
 			sampleBean.setUrl(sample.getUrl());
 			sampleBean.setName(sample.getName());
 			sampleBean.setDescription(sample.getDescription());
+
 			
 			result.add(sampleBean);
 			
@@ -91,6 +92,44 @@ public class SampleController {
 		
 		return result;
 	
+		
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
+	public SampleBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response){
+		
+		
+		System.out.println("in samples/id");
+		
+		//get sample
+		Sample sample = sampleDAO.findById(id).orElse(null);
+		if(sample == null) return null; //no sample found
+		
+		//result list
+		SampleBean result = new SampleBean(sample);
+		
+		
+		//get sample Descriptors
+		List<SampleToSampleDescriptor> sampleDescriptors = sampleToSampleDescriptorDAO.findSamepleDescriptorsBySampleId(sample.getSampleId());
+		
+		
+		List<SampleToSampleDescriptorBean> sdBean = new ArrayList<>();
+		
+		for(SampleToSampleDescriptor sampleDesc : sampleDescriptors) {
+			SampleToSampleDescriptorBean sampleToSampleDescriptorBean = new SampleToSampleDescriptorBean();
+			
+			sampleToSampleDescriptorBean.setSampleDescriptor(sampleDesc.getSampleDescriptor());
+			sampleToSampleDescriptorBean.setUnitOfMeasurement(sampleDesc.getUnitOfMeasurement());
+			sampleToSampleDescriptorBean.setValue(sampleDesc.getSampleToSampleDescPK().getSampleDescriptorValue());
+			sdBean.add(sampleToSampleDescriptorBean);
+			
+		}
+		
+		//add all sample descriptor to result bean
+		result.setSampleToSameDescriptorBean(sdBean);
+		
+		
+		return result;
 		
 	}
 	

@@ -1,6 +1,10 @@
 package edu.uga.ccrc.view.bean;
 
+import java.util.List;
+
 import edu.uga.ccrc.entity.Sample;
+import edu.uga.ccrc.entity.SampleDescriptor;
+import edu.uga.ccrc.entity.SampleToSampleDescriptor;
 
 public class SampleBean{
 	
@@ -15,6 +19,8 @@ public class SampleBean{
     private String description;
 		
     private String url;
+    
+    private List<SampleToSampleDescriptorBean> sampleToSameDescriptors;
     
     public SampleBean() {}
     
@@ -58,13 +64,7 @@ public class SampleBean{
 		this.url = url;
 	}
 
-	public Long getSample_type_id() {
-		return sampleTypeId;
-	}
-
-	public void setSample_type_id(Long sample_type_id) {
-		this.sampleTypeId = sample_type_id;
-	}
+	
 
 	@Override
 	public String toString() {
@@ -87,4 +87,14 @@ public class SampleBean{
 	public void setSampleTypeId(Long sampleTypeId) {
 		this.sampleTypeId = sampleTypeId;
 	}
+
+	public List<SampleToSampleDescriptorBean> getSampleToSameDescriptorBean() {
+		return sampleToSameDescriptors;
+	}
+
+	public void setSampleToSameDescriptorBean(List<SampleToSampleDescriptorBean> sampleToSameDescriptorBean) {
+		this.sampleToSameDescriptors = sampleToSameDescriptorBean;
+	}
+
+
 }

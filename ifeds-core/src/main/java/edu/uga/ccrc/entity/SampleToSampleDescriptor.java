@@ -61,5 +61,11 @@ public class SampleToSampleDescriptor {
 	public void setUnitOfMeasurement(String unitOfMeasurement) {
 		this.unitOfMeasurement = unitOfMeasurement;
 	}
+
+	@Override
+	public String toString() {
+		return "SampleToSampleDescriptor [sampleToSampleDescPK=" + sampleToSampleDescPK + ", sample=" + sample
+				+ ", sampleDescriptor=" + sampleDescriptor + ", unitOfMeasurement=" + unitOfMeasurement + "]";
+	}
 	
 }
