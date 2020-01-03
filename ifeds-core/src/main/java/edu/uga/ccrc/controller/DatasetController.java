@@ -611,7 +611,7 @@ public class DatasetController {
 		 
 		 if (resumableTotalChunks == resumableChunkNumber) {
 	           
-	            Files.move(tempFile, Paths.get("screenshots", resumableFilename), StandardCopyOption.REPLACE_EXISTING);
+	            Files.move(tempFile, Paths.get("datasetFile", resumableFilename), StandardCopyOption.REPLACE_EXISTING);
 	            return "File uploaded successfully";
 	        } else {
 	            return "continue" + "Total Chunks : " + resumableTotalChunks + "Last Chunk Number : "+ resumableChunkNumber;
