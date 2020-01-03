@@ -92,8 +92,8 @@ public class SampleBean{
 		return sampleToSameDescriptors;
 	}
 
-	public void setSampleToSameDescriptorBean(List<SampleToSampleDescriptorBean> sampleToSameDescriptorBean) {
-		this.sampleToSameDescriptors = sampleToSameDescriptorBean;
+	public void setSampleToSameDescriptorBean(List<SampleToSampleDescriptorBean> sampleToSameDescriptors) {
+		this.sampleToSameDescriptors = sampleToSameDescriptors;
 	}
 
 

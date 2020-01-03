@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
 
 @Component
@@ -44,6 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			} catch (IllegalArgumentException e) {
 				System.out.println("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
+
 				System.out.println("JWT Token has expired. Direct user to login page");
 			}
 		} else {

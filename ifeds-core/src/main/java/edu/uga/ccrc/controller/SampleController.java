@@ -30,6 +30,7 @@ import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptorPK;
 import edu.uga.ccrc.entity.SampleType;
+import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 import edu.uga.ccrc.view.bean.CreateSampleToSampleDescriptorHelperBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
@@ -138,7 +139,7 @@ public class SampleController {
 	
 		System.out.println("In Create Sample : ");
 		Long savedSampleId = null;
-		try {
+		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		
@@ -157,7 +158,13 @@ public class SampleController {
 		newSample.setSampleType(sampleType);
 		newSample.setUrl(sampleHelperBean.getUrl());
 		newSample.setDescription(sampleHelperBean.getDescription());
-		Sample saved = sampleDAO.save(newSample);
+		Sample saved = null;
+		try {
+		 saved = sampleDAO.save(newSample);
+		}catch(Exception e) {
+			
+			 throw new SQLException("Cannot save the sample. :  ");
+		}
 		savedSampleId = saved.getSampleId();			
 		
 		//create entry in sampleToSampleDescriptors
@@ -190,11 +197,7 @@ public class SampleController {
 	
 		return "{\n\tmessage: new sample created succssfully \n\t" + "id :" + saved.getSampleId() + "}";
 	
-		}catch(Exception e) {
-			
-			sampleDAO.deleteById(savedSampleId);
-			return  "{\n\tmessage: Something went wrong. Please try again after sometime}";
-		}
+		
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")
