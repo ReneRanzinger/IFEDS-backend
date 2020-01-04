@@ -120,10 +120,7 @@ public class DatasetController {
 	private JwtTokenUtil jwtTokenUtil;
 
 	@ApiOperation(value = "View a list of available datasets", response = List.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
-			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
-			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/datasets", produces = "application/json")
 	// http://localhost:8080/datasets
@@ -183,7 +180,6 @@ public class DatasetController {
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
 	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	// http://localhost:8080/dataset/1;
