@@ -183,7 +183,7 @@ public class DatasetController {
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	// http://localhost:8080/dataset/1;
-	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) {
+	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) throws EntityNotFoundException, ForbiddenException{
 
 		System.out.println("Retrieving dataset detail : getDatasetDetail() ");
 

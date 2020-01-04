@@ -135,7 +135,7 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
-	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) {
+	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException{
 	
 		System.out.println("In Create Sample : ");
 		Long savedSampleId = null;
