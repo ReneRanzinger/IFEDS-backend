@@ -1,5 +1,7 @@
 package edu.uga.ccrc.dao;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,7 +24,8 @@ public interface SampleToSampleDescriptorDAO extends CrudRepository<SampleToSamp
 	@Query(value="DELETE FROM core.sample_to_sample_descriptor where sample_id = ?1",nativeQuery=true)
 	public void deleteSampleToSampleDescriptorBySampleId(Long id);
 	
-	
+	@Query(value="SELECT * FROM core.sample_to_sample_descriptor where sample_id = ?1",nativeQuery=true)
+	public List<SampleToSampleDescriptor> findSamepleDescriptorsBySampleId(Long id);
 	
 
 }

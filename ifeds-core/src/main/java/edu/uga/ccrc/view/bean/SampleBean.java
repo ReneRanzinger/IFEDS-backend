@@ -1,10 +1,16 @@
 package edu.uga.ccrc.view.bean;
 
+import java.util.List;
+
 import edu.uga.ccrc.entity.Sample;
+import edu.uga.ccrc.entity.SampleDescriptor;
+import edu.uga.ccrc.entity.SampleToSampleDescriptor;
 
 public class SampleBean{
 	
 	private Long sampleId;
+	
+	private String sampleTypeName;
 	
 	private Long sampleTypeId;
 	
@@ -13,6 +19,8 @@ public class SampleBean{
     private String description;
 		
     private String url;
+    
+    private List<SampleToSampleDescriptorBean> sampleToSameDescriptors;
     
     public SampleBean() {}
     
@@ -56,17 +64,37 @@ public class SampleBean{
 		this.url = url;
 	}
 
-	public Long getSample_type_id() {
-		return sampleTypeId;
-	}
-
-	public void setSample_type_id(Long sample_type_id) {
-		this.sampleTypeId = sample_type_id;
-	}
+	
 
 	@Override
 	public String toString() {
 		return "SampleBean [sampleId=" + sampleId + ", sampleTypeId=" + sampleTypeId + ", name=" + name
 				+ ", description=" + description + ", url=" + url + "]";
 	}
+
+	public String getSampleTypeName() {
+		return sampleTypeName;
+	}
+
+	public void setSampleTypeName(String sampleTypeName) {
+		this.sampleTypeName = sampleTypeName;
+	}
+
+	public Long getSampleTypeId() {
+		return sampleTypeId;
+	}
+
+	public void setSampleTypeId(Long sampleTypeId) {
+		this.sampleTypeId = sampleTypeId;
+	}
+
+	public List<SampleToSampleDescriptorBean> getSampleToSameDescriptorBean() {
+		return sampleToSameDescriptors;
+	}
+
+	public void setSampleToSameDescriptorBean(List<SampleToSampleDescriptorBean> sampleToSameDescriptors) {
+		this.sampleToSameDescriptors = sampleToSameDescriptors;
+	}
+
+
 }

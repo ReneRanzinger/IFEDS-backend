@@ -30,6 +30,7 @@ import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptorPK;
 import edu.uga.ccrc.entity.SampleType;
+import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 import edu.uga.ccrc.view.bean.CreateSampleToSampleDescriptorHelperBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
@@ -79,10 +80,12 @@ public class SampleController {
 			SampleBean sampleBean = new SampleBean();
 			
 			sampleBean.setSampleId(sample.getSampleId());
-			sampleBean.setSample_type_id(sample.getSampleType().getSampleTypeId());
+			sampleBean.setSampleTypeId(sample.getSampleType().getSampleTypeId());
+			sampleBean.setSampleTypeName(sample.getSampleType().getName());
 			sampleBean.setUrl(sample.getUrl());
 			sampleBean.setName(sample.getName());
 			sampleBean.setDescription(sample.getDescription());
+
 			
 			result.add(sampleBean);
 			
@@ -93,12 +96,50 @@ public class SampleController {
 		
 	}
 	
+	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
+	public SampleBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response){
+		
+		
+		System.out.println("in samples/id");
+		
+		//get sample
+		Sample sample = sampleDAO.findById(id).orElse(null);
+		if(sample == null) return null; //no sample found
+		
+		//result list
+		SampleBean result = new SampleBean(sample);
+		
+		
+		//get sample Descriptors
+		List<SampleToSampleDescriptor> sampleDescriptors = sampleToSampleDescriptorDAO.findSamepleDescriptorsBySampleId(sample.getSampleId());
+		
+		
+		List<SampleToSampleDescriptorBean> sdBean = new ArrayList<>();
+		
+		for(SampleToSampleDescriptor sampleDesc : sampleDescriptors) {
+			SampleToSampleDescriptorBean sampleToSampleDescriptorBean = new SampleToSampleDescriptorBean();
+			
+			sampleToSampleDescriptorBean.setSampleDescriptor(sampleDesc.getSampleDescriptor());
+			sampleToSampleDescriptorBean.setUnitOfMeasurement(sampleDesc.getUnitOfMeasurement());
+			sampleToSampleDescriptorBean.setValue(sampleDesc.getSampleToSampleDescPK().getSampleDescriptorValue());
+			sdBean.add(sampleToSampleDescriptorBean);
+			
+		}
+		
+		//add all sample descriptor to result bean
+		result.setSampleToSameDescriptorBean(sdBean);
+		
+		
+		return result;
+		
+	}
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
-	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) {
+	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException{
 	
 		System.out.println("In Create Sample : ");
 		Long savedSampleId = null;
-		try {
+		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		
@@ -117,7 +158,13 @@ public class SampleController {
 		newSample.setSampleType(sampleType);
 		newSample.setUrl(sampleHelperBean.getUrl());
 		newSample.setDescription(sampleHelperBean.getDescription());
-		Sample saved = sampleDAO.save(newSample);
+		Sample saved = null;
+		try {
+		 saved = sampleDAO.save(newSample);
+		}catch(Exception e) {
+			
+			 throw new SQLException("Cannot save the sample. :  ");
+		}
 		savedSampleId = saved.getSampleId();			
 		
 		//create entry in sampleToSampleDescriptors
@@ -150,11 +197,7 @@ public class SampleController {
 	
 		return "{\n\tmessage: new sample created succssfully \n\t" + "id :" + saved.getSampleId() + "}";
 	
-		}catch(Exception e) {
-			
-			sampleDAO.deleteById(savedSampleId);
-			return  "{\n\tmessage: Something went wrong. Please try again after sometime}";
-		}
+		
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")

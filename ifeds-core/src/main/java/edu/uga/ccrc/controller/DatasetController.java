@@ -1,8 +1,13 @@
-/**
- * @author Susan George
- */
+
 package edu.uga.ccrc.controller;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,8 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.ByteBuffer;
 import edu.uga.ccrc.config.JwtTokenUtil;
 import edu.uga.ccrc.dao.DatasetDAO;
 import edu.uga.ccrc.dao.DatasetToExperimentTypeDAO;
@@ -112,10 +120,7 @@ public class DatasetController {
 	private JwtTokenUtil jwtTokenUtil;
 
 	@ApiOperation(value = "View a list of available datasets", response = List.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
-			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
-			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/datasets", produces = "application/json")
 	// http://localhost:8080/datasets
@@ -175,11 +180,10 @@ public class DatasetController {
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
 	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	// http://localhost:8080/dataset/1;
-	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) {
+	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) throws EntityNotFoundException, ForbiddenException{
 
 		System.out.println("Retrieving dataset detail : getDatasetDetail() ");
 
@@ -573,5 +577,44 @@ public class DatasetController {
 				
 		
 	}
+	
+	/*
+	 * UPLOAD FILE
+	 * 
+	 */
+	@ApiOperation(value = "Upload file", response = List.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "File uploaded successfully"),
+			@ApiResponse(code = 401, message = "You are not authorized to view the dataset"),
+			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+	@CrossOrigin
+	@RequestMapping(value = "/dataset/file/upload", consumes = {"multipart/form-data"}, method = RequestMethod.POST, produces="application/json")
+	public String uploadFile(@RequestParam("file") MultipartFile file, 
+			@RequestParam("resumableFilename") String resumableFilename,
+			@RequestParam("resumableChunkSize") long resumableChunkSize,
+            @RequestParam("resumableChunkNumber") int resumableChunkNumber,
+            @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException {
+		
+		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
+		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
+		 
+		 try (FileChannel channel = FileChannel.open(tempFile, StandardOpenOption.WRITE,StandardOpenOption.CREATE)) {
+	            channel.position((resumableChunkNumber - 1) * resumableChunkSize);
+	            while (out.hasRemaining()) {
+	                channel.write(out);
+	            }
+	      }
+		 
+		 if (resumableTotalChunks == resumableChunkNumber) {
+	           
+	            Files.move(tempFile, Paths.get("datasetFile", resumableFilename), StandardCopyOption.REPLACE_EXISTING);
+	            return "File uploaded successfully";
+	        } else {
+	            return "continue" + "Total Chunks : " + resumableTotalChunks + "Last Chunk Number : "+ resumableChunkNumber;
+	        }
+		
+	}
+	
+
 	
 }

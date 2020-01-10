@@ -15,6 +15,7 @@ public interface SampleDAO extends CrudRepository<Sample, Long> {
 
 	 @Query(value = "SELECT * FROM core.Sample WHERE provider_id = :provider_id", nativeQuery = true)
 	 public List<Sample> findSampleByProviderId(Long provider_id);
+	 
 	
 	 public Sample save(Sample newSample);
 	 
