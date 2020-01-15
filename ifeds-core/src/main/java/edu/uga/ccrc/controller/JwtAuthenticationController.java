@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.uga.ccrc.config.JwtTokenUtil;
+import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
 import edu.uga.ccrc.view.bean.JwtRequestBean;
 import edu.uga.ccrc.view.bean.JwtResponseBean;
+import io.jsonwebtoken.MalformedJwtException;
 
 
 @RestController
@@ -51,6 +53,8 @@ public class JwtAuthenticationController {
 			throw new Exception("USER_DISABLED", e);
 		}catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
+		}catch (MalformedJwtException e) {
+			throw new ForbiddenException("Please login again");
 		}
 }
 }

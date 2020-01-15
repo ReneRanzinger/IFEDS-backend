@@ -17,6 +17,7 @@ import edu.uga.ccrc.dao.DatasetDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.Provider;
+import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 
@@ -51,7 +52,7 @@ public class ProviderController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProviderDatasets", produces="application/json")
-	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) {
+	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
 		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
 		
 		final String requestTokenHeader = request.getHeader("Authorization");

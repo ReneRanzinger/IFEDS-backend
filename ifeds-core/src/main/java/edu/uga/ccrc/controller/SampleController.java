@@ -30,6 +30,7 @@ import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptor;
 import edu.uga.ccrc.entity.SampleToSampleDescriptorPK;
 import edu.uga.ccrc.entity.SampleType;
+import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 import edu.uga.ccrc.view.bean.CreateSampleToSampleDescriptorHelperBean;
@@ -58,7 +59,8 @@ public class SampleController {
 	private JwtTokenUtil jwtTokenUtil;
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getSample", produces="application/json")
-	public List<SampleBean> getSamples(HttpServletRequest request, HttpServletResponse response) {
+	public List<SampleBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
+		
 		System.out.println("Retrieving provider's uploaded dataset information : getSamples() ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		
@@ -69,7 +71,10 @@ public class SampleController {
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 
 		//get provider data by username
-		Provider provider = providerDao.findByUsername(username); 
+		Provider provider = providerDao.findByUsername(username);
+		
+		//
+		
 		String providerName = provider.getName();
 		
 		//search in the dataset, the dataset owned by current provider
@@ -135,7 +140,7 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
-	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException{
+	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException, EntityNotFoundException{
 	
 		System.out.println("In Create Sample : ");
 		Long savedSampleId = null;
@@ -163,7 +168,7 @@ public class SampleController {
 		 saved = sampleDAO.save(newSample);
 		}catch(Exception e) {
 			
-			 throw new SQLException("Cannot save the sample. :  ");
+			 throw new SQLException("Cannot save the sample. :  "+e.getLocalizedMessage());
 		}
 		savedSampleId = saved.getSampleId();			
 		
@@ -182,6 +187,9 @@ public class SampleController {
 			//3) Get Sample Descriptor
 			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
 			
+			if(sampleDescriptor == null) {
+				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
+			}
 			
 			//4) Set all entries
 			sampleToSampleDescriptor.setSampleToSampleDescPK(sampleToSampleDescPK);	
@@ -201,7 +209,7 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")
-	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) {
+	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update Sample : ");
 		
@@ -219,10 +227,10 @@ public class SampleController {
 		
 		
 		//create sample	
-		try{	
+		
 		sample = sampleDAO.findById(id).orElse(null);
 		if(sample == null)
-			return  "{\n\tmessage: Sample Doesn't exist}";
+			throw new EntityNotFoundException("Sample with id : "+ id +" not present");
 		
 		sample.setProvider(owner);
 		sample.setName(sampleHelperBean.getName());
@@ -247,6 +255,10 @@ public class SampleController {
 			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
 			
 			
+			if(sampleDescriptor == null) {
+				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
+			}
+			
 			//4) Set all entries
 			sampleToSampleDescriptor.setSampleToSampleDescPK(sampleToSampleDescPK);	
 			sampleToSampleDescriptor.setSample(saved);
@@ -261,23 +273,23 @@ public class SampleController {
 		return "message : Sample Updated : " + id;
 
 			
-		}
-		catch(Exception e) {
-			return  "{\n\tmessage: Something went wrong. Please try again after sometime}" + e.getMessage() ;
-			
-		}
+	}
+	
 		
 	
 		
-	}
+	
 	
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/samples/{id}", produces="application/json")
-	public List<String> deleteSample(@PathVariable Long id) {
+	public List<String> deleteSample(@PathVariable Long id) throws EntityNotFoundException {
 		List<String> res = new ArrayList<>();
+		if(sampleDAO.findById(id).orElse(null) == null)
+			throw new EntityNotFoundException("Id not present : " + id);
+		
 		System.out.println("Deleting Sample : deleteSample() id : " + id);
 		sampleDAO.deleteById(id);
-		res.add("success");	
+		res.add("Sample with id " + id +" deleted successfully");	
 			
 		
 		return res;

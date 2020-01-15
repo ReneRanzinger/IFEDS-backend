@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,7 +63,7 @@ import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
-
+import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DataFileBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DatasetDetailBean;
@@ -124,7 +125,7 @@ public class DatasetController {
 	@CrossOrigin
 	@GetMapping(value = "/datasets", produces = "application/json")
 	// http://localhost:8080/datasets
-	public List<DatasetBean> getAllDatasets(HttpServletRequest request) {
+	public List<DatasetBean> getAllDatasets(HttpServletRequest request) throws SQLException, EntityNotFoundException {
 
 		System.out.println("Retrieving datasets : getAllDatasets() ");
 		List<DatasetBean> res = new ArrayList<DatasetBean>();
@@ -152,6 +153,9 @@ public class DatasetController {
 			String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 
 			Provider provider = providerDAO.findByUsername(username);
+			
+			if(provider == null)
+				throw new SQLException("Provider not found. Please check the credentials");
 
 			if (provider != null) {
 				// View all public datasets and private datasets owned by the provider
@@ -301,7 +305,7 @@ public class DatasetController {
 	 * 
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/datasets", produces="application/json")
-	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) {
+	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException {
 		
 		
 		System.out.println("In create dataset : ");
@@ -316,7 +320,7 @@ public class DatasetController {
 		dataset.setSample(sampleDAO.findById(createDatasetHelperBean.getSampleIds()).orElse(null));
 		
 		if(dataset.getSample() == null)
-			return "{\n\tError : Sample doesn't exists}";
+			throw new EntityNotFoundException("Sample id doesn't exists");
 		
 		
 		//token starts after 7th position as token is appnended with 'Bearer' 
@@ -333,8 +337,11 @@ public class DatasetController {
 		
 		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
 
-		dataset = datasetDAO.save(dataset);
-		
+		try {
+			dataset = datasetDAO.save(dataset);
+		}catch(Exception e) {
+			throw new SQLException(e.getLocalizedMessage());
+		}
 		
 		
 		//2)Save dataset-to-funding-grant 
@@ -352,7 +359,8 @@ public class DatasetController {
 			
 			if(fundingSource == null) {
 				datasetDAO.deleteById(dataset.getDatasetId());
-				return "{\n\tError : Funding Source doesn't exists}";
+				throw new EntityNotFoundException("Funding source doesn't exists");
+				
 			}
 			
 			fundingGrant.setDataset(dataset);
@@ -376,7 +384,7 @@ public class DatasetController {
 			if(experimentType == null) {
 				System.out.println("deleteing dataset" + dataset.getDatasetId());
 				datasetDAO.deleteById(dataset.getDatasetId());
-				return "{\n\tError : Experiment Type doesn't exists}";
+				throw new EntityNotFoundException("Experiment type doesn't exists : " + expTypeIdAndDes.getExperiment_type_id());
 			}
 			
 			//build composite PK
@@ -402,7 +410,7 @@ public class DatasetController {
 			Keyword keyword = keywordDAO.findById(keyWordId).orElse(null);
 			if(keyword == null) {
 				datasetDAO.deleteById(dataset.getDatasetId());
-				return "{\n\tError : keyword doesn't exists}";
+				throw new EntityNotFoundException("Keyword doesn't exists : " + keyWordId);
 			}
 			
 			//build compositePk
@@ -427,7 +435,7 @@ public class DatasetController {
 			Paper paper = paperDAO.findById(paperId).orElse(null);
 			if(paper == null) {
 				datasetDAO.deleteById(dataset.getDatasetId());
-				return "{\n\tError : Paper doesn't exists}";
+				throw new EntityNotFoundException("Paper doesn't exists : " + paperId);
 			}
 			
 			//build composite PK
@@ -450,14 +458,14 @@ public class DatasetController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/datasets/{id}", produces="application/json")
-	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) {
+	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update dataset : ");
 		Dataset dataset = datasetDAO.findById(id).orElse(null);
+		
 		if(dataset == null) {
+			throw new EntityNotFoundException("Dataset Not found : "+id);
 			
-			new EntityNotFoundException("Not found");
-			return null;
 		}
 		dataset.setDescription(createDatasetHelperBean.getDescription());
 		
@@ -480,7 +488,7 @@ public class DatasetController {
 					
 					if(fundingSource == null) {
 						datasetDAO.deleteById(dataset.getDatasetId());
-						return "{\n\tError : Funding Source doesn't exists}";
+						throw new EntityNotFoundException("Funding source doesn't exists");
 					}
 					
 					fundingGrant.setDataset(dataset);
@@ -503,7 +511,7 @@ public class DatasetController {
 					if(experimentType == null) {
 						System.out.println("deleteing dataset" + dataset.getDatasetId());
 						datasetDAO.deleteById(dataset.getDatasetId());
-						return "{\n\tError : Experiment Type doesn't exists}";
+						throw new EntityNotFoundException("Experiment type doesn't exists");
 					}
 					
 					//build composite PK
@@ -530,7 +538,7 @@ public class DatasetController {
 					Keyword keyword = keywordDAO.findById(keyWordId).orElse(null);
 					if(keyword == null) {
 						datasetDAO.deleteById(dataset.getDatasetId());
-						return "{\n\tError : keyword doesn't exists}";
+						throw new EntityNotFoundException("Keyword doesn't exists");
 					}
 					
 					//build compositePk
@@ -556,7 +564,7 @@ public class DatasetController {
 					Paper paper = paperDAO.findById(paperId).orElse(null);
 					if(paper == null) {
 						datasetDAO.deleteById(dataset.getDatasetId());
-						return "{\n\tError : Paper doesn't exists}";
+						throw new EntityNotFoundException("Paper doesn't exists");
 					}
 					
 					//build composite PK

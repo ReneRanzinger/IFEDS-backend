@@ -14,6 +14,7 @@ import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ErrorDetails;
 import edu.uga.ccrc.exception.ExpiredJwtException;
 import edu.uga.ccrc.exception.ForbiddenException;
+import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 
 @ControllerAdvice
@@ -55,4 +56,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		error.setMessage(ex.getMessage());	
 		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@ExceptionHandler(NoResponeException.class)
+	protected ResponseEntity<Object> handleNoResponseException(WebRequest request) {
+		ErrorDetails error = new ErrorDetails();
+		error.setTimestamp(new Date());
+		error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		error.setMessage("Something went wrong. Please try after sometime");	
+		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	
+	
 }

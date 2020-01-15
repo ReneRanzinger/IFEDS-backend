@@ -1,16 +1,21 @@
-/**
- * @author Susan George
- */
+
 package edu.uga.ccrc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.SQLException;
+
 @SpringBootApplication
 public class IfedsCoreApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NoResponeException {
+		try {
 		SpringApplication.run(IfedsCoreApplication.class, args);
+		}catch(Exception e){
+			throw new NoResponeException("Application cannot start");
+		}
 	}
 	
 	
