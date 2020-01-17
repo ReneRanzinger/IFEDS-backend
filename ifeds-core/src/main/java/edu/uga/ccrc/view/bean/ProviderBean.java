@@ -29,15 +29,7 @@ public class ProviderBean{
 		
 	}
 	
-	public void setUserName(String username)
-	{
-		this.username = username;
-	}
-	
-	public String getUserName()
-	{
-		return	 username;
-	}
+
 	
 	public void setName(String name) {
 		this.name = name;
