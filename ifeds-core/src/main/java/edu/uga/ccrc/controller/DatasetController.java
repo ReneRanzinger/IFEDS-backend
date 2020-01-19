@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -597,11 +598,13 @@ public class DatasetController {
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	@CrossOrigin
 	@RequestMapping(value = "/dataset/file/upload", consumes = {"multipart/form-data"}, method = RequestMethod.POST, produces="application/json")
+
 	public String uploadFile(@RequestParam("file") MultipartFile file, 
 			@RequestParam("resumableFilename") String resumableFilename,
 			@RequestParam("resumableChunkSize") long resumableChunkSize,
             @RequestParam("resumableChunkNumber") int resumableChunkNumber,
             @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException {
+		 
 		
 		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
 		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
@@ -612,14 +615,18 @@ public class DatasetController {
 	                channel.write(out);
 	            }
 	      }
-		 
+		
 		 if (resumableTotalChunks == resumableChunkNumber) {
 	           
 	            Files.move(tempFile, Paths.get("datasetFile", resumableFilename), StandardCopyOption.REPLACE_EXISTING);
+	            System.out.println("File uploaded successfuly");
 	            return "File uploaded successfully";
 	        } else {
-	            return "continue" + "Total Chunks : " + resumableTotalChunks + "Last Chunk Number : "+ resumableChunkNumber;
+	        	System.out.println("File uploaded in progress");
+	            return "continue" + "Total Chunks : " + resumableTotalChunks + " Last Chunk Number : "+ resumableChunkNumber;
 	        }
+		 
+	
 		
 	}
 	
