@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.ByteBuffer;
 import edu.uga.ccrc.config.JwtTokenUtil;
+import edu.uga.ccrc.dao.DataFileDAO;
+import edu.uga.ccrc.dao.DataTypeDAO;
 import edu.uga.ccrc.dao.DatasetDAO;
 import edu.uga.ccrc.dao.DatasetToExperimentTypeDAO;
 import edu.uga.ccrc.dao.DatasetToKeywordDAO;
@@ -45,6 +48,7 @@ import edu.uga.ccrc.dao.PaperDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.dao.SampleDAO;
 import edu.uga.ccrc.entity.DataFile;
+import edu.uga.ccrc.entity.DataType;
 import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.DatasetToExperimentType;
 import edu.uga.ccrc.entity.DatasetToExperimentTypePK;
@@ -64,11 +68,13 @@ import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
+import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DataFileBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DatasetDetailBean;
 import edu.uga.ccrc.view.bean.DatasetToExperimentTypeBean;
+import edu.uga.ccrc.view.bean.FileUploadBean;
 import edu.uga.ccrc.view.bean.FundingGrantBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
@@ -101,6 +107,12 @@ public class DatasetController {
 	
 	@Autowired
 	DatasetToExperimentTypeDAO datasetToExperimentTypeDAO;
+	
+	@Autowired
+	DataFileDAO dataFileDAO;
+	
+	@Autowired
+	DataTypeDAO dataTypeDAO;
 	
 	@Autowired
 	DatasetToKeywordDAO datasetToKeywordDAO;
@@ -599,12 +611,16 @@ public class DatasetController {
 	@CrossOrigin
 	@RequestMapping(value = "/dataset/file/upload", consumes = {"multipart/form-data"}, method = RequestMethod.POST, produces="application/json")
 
-	public String uploadFile(@RequestParam("file") MultipartFile file, 
+	public FileUploadBean uploadFile(@RequestParam("file") MultipartFile file, 
 			@RequestParam("resumableFilename") String resumableFilename,
+			@RequestParam("resumableRelativePath") String relativePath,
 			@RequestParam("resumableChunkSize") long resumableChunkSize,
             @RequestParam("resumableChunkNumber") int resumableChunkNumber,
-            @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException {
+            @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException, SQLException {
+		/* 
 		 
+       
+		*/
 		
 		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
 		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
@@ -617,19 +633,98 @@ public class DatasetController {
 	      }
 		
 		 if (resumableTotalChunks == resumableChunkNumber) {
-	           
-	            Files.move(tempFile, Paths.get("datasetFile", resumableFilename), StandardCopyOption.REPLACE_EXISTING);
+			 	
+			    
 	            System.out.println("File uploaded successfuly");
-	            return "File uploaded successfully";
+	           
+	            //save the file in db
+	            long dataFileId = saveUploadedFile("/datasetFile", resumableFilename.split(",")[0]);
+	            
+	            //save the file in system with the name as file id
+	            Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
+	            
+	            //prepare result bean with success message
+	            FileUploadBean result = new FileUploadBean(dataFileId, "File Uploaded Successfully");
+	            
+	            //return
+	            return result;
+	            
 	        } else {
 	        	System.out.println("File uploaded in progress");
-	            return "continue" + "Total Chunks : " + resumableTotalChunks + " Last Chunk Number : "+ resumableChunkNumber;
+	        	FileUploadBean result = new FileUploadBean((long)-1, "File uploaded in progress");
+	        	return result;
 	        }
 		 
 	
 		
 	}
 	
+	/*
+	 * 
+	 * SAVE THE UPLOADED FILE
+	 */
+	
+	private long saveUploadedFile(String filePath, String orginalFileName) throws SQLException {
+		
+		DataFile dataFile = new DataFile();
+	
+		dataFile.setOrigFileName(orginalFileName);
+		dataFile = dataFileDAO.save(dataFile);
+		
+		return dataFile.getDataFileId();
+		
+	}
+	/*
+	 * 
+	 * SAVE THE META INFO
+	 */
 
+
+	@RequestMapping(method = RequestMethod.GET, value = "/dataset/file/save_info", produces="application/json")
+	public String saveMetaInformation( @RequestParam("file_id") long file_id, @RequestParam("dataset_type_id") long dataset_type_id,
+	        @RequestParam("description") String description,@RequestParam("dataset_id") long dataset_id ) throws NoResponeException {
+		
+		DataFile dataFile = dataFileDAO.findById(file_id).orElse(null);
+		
+		Dataset dataSet = datasetDAO.findById(dataset_id).orElse(null);
+		
+		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null);
+		
+		if(dataFile == null)
+			throw new IllegalArgumentException("File id not valid");
+		
+		if(dataSet == null)
+			throw new IllegalArgumentException("Dataset id not valid");
+		
+	
+		if(dataType == null)
+			throw new IllegalArgumentException("DataType id not valid");
+		
+		dataFile.setDataset(dataSet);
+		dataFile.setDataType(dataType);
+		dataFile.setDescription(description);
+		try {
+			dataFileDAO.save(dataFile);
+			return "Success";
+		}
+		catch(Exception e) {
+			throw new NoResponeException("Something went wrong. Please try after sometime");
+		}
+		
+	}
+	
+	/*
+	 * 
+	 * Return data-type list
+	 */
+
+
+	@RequestMapping(method = RequestMethod.GET, value = "/dataTypes", produces="application/json")
+	public List<DataType> getDataTypeList() {
+		
+		List<DataType> dataTypes = dataTypeDAO.findAll();
+		return dataTypes;
+	}
+	
 	
 }

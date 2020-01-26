@@ -111,7 +111,7 @@ CREATE TABLE core.data_file
 	data_type_id integer NOT NULL REFERENCES core.data_type ON UPDATE CASCADE ON DELETE CASCADE,
 	original_file_name VARCHAR(64) NOT NULL,
 	description VARCHAR(1000),
-	UNIQUE(dataset_id,original_file_name)
+	UNIQUE(dataset_id)
 );
 
 CREATE TABLE core.dataset_to_experiment_type

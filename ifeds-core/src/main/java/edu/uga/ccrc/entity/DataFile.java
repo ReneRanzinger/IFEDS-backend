@@ -33,10 +33,14 @@ public class DataFile {
 	@Column(name="original_file_name", length=64, nullable=false)
 	private String origFileName;
 	
+	@Column(name="data_file_mangled_name", length=64, nullable=false)
+	private String data_file_mangled_name;
+	
+	
 	@Column(name="description", length=1000)
 	private String description;
 	
-	protected DataFile() {}
+	public DataFile() {}
 
 	public Long getDataFileId() {
 		return dataFileId;
@@ -76,5 +80,13 @@ public class DataFile {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getData_file_mangled_name() {
+		return data_file_mangled_name;
+	}
+
+	public void setData_file_mangled_name(String data_file_mangled_name) {
+		this.data_file_mangled_name = data_file_mangled_name;
 	}
 }

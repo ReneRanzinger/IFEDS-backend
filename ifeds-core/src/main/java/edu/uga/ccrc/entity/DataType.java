@@ -28,9 +28,7 @@ public class DataType {
 	@Column(length=256)
 	private String url;
 	
-	@OneToMany(mappedBy = "dataType")
-    Set<DataFile> dataFiles;
-	
+
 	protected DataType() {}
 
 	public Long getDataTypeId() {
@@ -65,11 +63,5 @@ public class DataType {
 		this.url = url;
 	}
 
-	public Set<DataFile> getDataFiles() {
-		return dataFiles;
-	}
 
-	public void setDataFiles(Set<DataFile> dataFiles) {
-		this.dataFiles = dataFiles;
-	}
 }
