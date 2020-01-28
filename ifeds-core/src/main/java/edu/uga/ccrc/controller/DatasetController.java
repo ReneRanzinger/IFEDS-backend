@@ -667,9 +667,19 @@ public class DatasetController {
 	private long saveUploadedFile(String filePath, String orginalFileName) throws SQLException {
 		
 		DataFile dataFile = new DataFile();
-	
-		dataFile.setOrigFileName(orginalFileName);
+		long datasetId = 70;
+		long dataset_type_id = 1;
+		
+		Dataset dataSet = datasetDAO.findById(datasetId).orElse(null);
+		
+		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null);
+		
+		dataFile.setOrigFileName(orginalFileName);	
+		dataFile.setDataType(dataType);
+		dataFile.setDataset(dataSet);
 		dataFile = dataFileDAO.save(dataFile);
+		
+	
 		
 		return dataFile.getDataFileId();
 		
