@@ -111,12 +111,8 @@ CREATE TABLE core.data_file
 	data_type_id integer NOT NULL REFERENCES core.data_type ON UPDATE CASCADE ON DELETE CASCADE,
 	original_file_name VARCHAR(64) NOT NULL,
 	description VARCHAR(1000),
-<<<<<<< HEAD
 	UNIQUE(dataset_id)
-=======
-	data_file_mangled_name VARCHAR(64) NOT NULL,
-	UNIQUE(dataset_id,original_file_name, data_file_mangled_name)
->>>>>>> branch 'master' of https://github.com/ReneRanzinger/IFEDS-backend
+
 );
 
 CREATE TABLE core.dataset_to_experiment_type
