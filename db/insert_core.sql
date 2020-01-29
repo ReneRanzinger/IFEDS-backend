@@ -25,6 +25,7 @@ VALUES
 
 INSERT INTO core.data_type(name,description)
 VALUES
+	('in progress','in progress data file.'),
 	('MS','Mass spectrometry data file.'),
 	('NMR','NMR data file.'),
 	('LC','Liquid chromatography data file.'),

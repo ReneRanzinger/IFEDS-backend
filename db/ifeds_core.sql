@@ -107,7 +107,7 @@ CREATE TABLE core.data_type
 CREATE TABLE core.data_file
 (
 	data_file_id serial NOT NULL PRIMARY KEY,
-	dataset_id integer NOT NULL REFERENCES core.dataset ON UPDATE CASCADE ON DELETE CASCADE,
+	dataset_id integer NULL REFERENCES core.dataset ON UPDATE CASCADE ON DELETE CASCADE,
 	data_type_id integer NOT NULL REFERENCES core.data_type ON UPDATE CASCADE ON DELETE CASCADE,
 	original_file_name VARCHAR(64) NOT NULL,
 	description VARCHAR(1000),
