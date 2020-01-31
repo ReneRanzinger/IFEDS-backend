@@ -9,8 +9,8 @@ COPY --from=clone app/IFEDS-backend/ifeds-core/pom.xml /app
 RUN mvn verify clean --fail-never
 
 # Image layer: with the application
-COPY --from=clone app/IFEDS-backend /app
-RUN mvn clean install -DskipTests
+COPY --from=clone app/IFEDS-backend/ifeds-core /app
+RUN mvn clean install -DskipTests -Dspring.profiles.active=prod
 
 FROM openjdk:8-alpine
 WORKDIR /app
