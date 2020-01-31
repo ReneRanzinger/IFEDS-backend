@@ -71,6 +71,7 @@ import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DataFileBean;
+import edu.uga.ccrc.view.bean.DataFileInfoBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DatasetDetailBean;
 import edu.uga.ccrc.view.bean.DatasetToExperimentTypeBean;
@@ -691,15 +692,14 @@ public class DatasetController {
 	 */
 
 
-	@RequestMapping(method = RequestMethod.GET, value = "/dataset/file/save_info", produces="application/json")
-	public String saveMetaInformation( @RequestParam("file_id") long file_id, @RequestParam("dataset_type_id") long dataset_type_id,
-	        @RequestParam("description") String description,@RequestParam("dataset_id") long dataset_id ) throws NoResponeException {
+	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
+	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException {
+		System.out.println("Inside save file");
+		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		
-		DataFile dataFile = dataFileDAO.findById(file_id).orElse(null);
+		Dataset dataSet = datasetDAO.findById(dataFileInfo.getDataset_id()).orElse(null);
 		
-		Dataset dataSet = datasetDAO.findById(dataset_id).orElse(null);
-		
-		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null);
+		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
 		
 		if(dataFile == null)
 			throw new IllegalArgumentException("File id not valid");
@@ -713,7 +713,7 @@ public class DatasetController {
 		
 		dataFile.setDataset(dataSet);
 		dataFile.setDataType(dataType);
-		dataFile.setDescription(description);
+		dataFile.setDescription(dataFileInfo.getDescription());
 		try {
 			dataFileDAO.save(dataFile);
 			return "Success";
