@@ -1,9 +1,12 @@
 
 package edu.uga.ccrc.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -640,7 +643,7 @@ public class DatasetController {
 	            long file_size = FileChannel.open(tempFile).size();
 	            
 	            //save the file in db
-	            long dataFileId = saveUploadedFile("/datasetFile", resumableFilename.split(",")[0], file_size);
+	            long dataFileId = saveUploadedFile("datasetFile", resumableFilename.split(",")[0], file_size);
 	            
 	            //save the file in system with the name as file id
 	            Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
@@ -694,7 +697,7 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
-	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException {
+	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		
@@ -704,14 +707,14 @@ public class DatasetController {
 		System.out.println(dataFileInfo.getData_type_id());
 		
 		if(dataFile == null)
-			throw new IllegalArgumentException("File id not valid");
+			throw new EntityNotFoundException("File id not valid");
 		
 		if(dataSet == null)
-			throw new IllegalArgumentException("Dataset id not valid");
+			throw new EntityNotFoundException("Dataset id not valid");
 		
 	
 		if(dataType == null)
-			throw new IllegalArgumentException("DataType id not valid");
+			throw new EntityNotFoundException("DataType id not valid");
 		
 		
 		dataFile.setDataset(dataSet);
@@ -746,6 +749,54 @@ public class DatasetController {
 		
 		List<DataType> dataTypes = dataTypeDAO.findAll();
 		return dataTypes;
+	}
+	
+	/*
+	 * 
+	 * Return data-type list
+	 */
+
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
+	public String deleteUploadedFile(@PathVariable Long id) throws NoResponeException, EntityNotFoundException {
+		System.out.println("In delete file");
+		
+			if(!dataFileDAO.existsById(id))
+				throw new EntityNotFoundException("File id doesn't exist");
+			
+			deletePhysicalFile(id);
+			try {
+			dataFileDAO.deleteById(id);
+			}catch(Exception e){
+				throw new NoResponeException("Something went wrong. Please try after sometime");
+			}
+			
+			return "Deleted";
+			
+		
+		
+	}
+
+	private void deletePhysicalFile(Long id) throws EntityNotFoundException {
+		// TODO Auto-generated method stub
+		try
+        { 
+			System.out.println("In delete physical file" +id);
+            Files.delete(Paths.get("datasetFile/"+id)); 
+        } 
+        catch(NoSuchFileException e) 
+        { 
+            throw new EntityNotFoundException("No such file/directory exists"); 
+        } 
+        catch(DirectoryNotEmptyException e) 
+        { 
+            throw new EntityNotFoundException("Directory is not empty."); 
+        } 
+        catch(IOException e) 
+        { 
+            throw new EntityNotFoundException("Invalid permissions."); 
+        } 
+          
 	}
 	
 	

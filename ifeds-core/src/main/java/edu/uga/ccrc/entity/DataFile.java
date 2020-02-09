@@ -11,9 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name="data_file", schema="core",
-	    uniqueConstraints=
-	        @UniqueConstraint(columnNames={"dataset_id"})
+@Table(name="data_file", schema="core"
 	)
 public class DataFile {
 	
