@@ -37,6 +37,9 @@ public class DataFile {
 	@Column(name="description", length=1000)
 	private String description;
 	
+	@Column(name="data_file_size")
+	private Long data_file_size;
+	
 	public DataFile() {}
 
 	public Long getDataFileId() {
@@ -77,5 +80,13 @@ public class DataFile {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Long getSize() {
+		return data_file_size;
+	}
+
+	public void setSize(Long size) {
+		this.data_file_size = size;
 	}
 }

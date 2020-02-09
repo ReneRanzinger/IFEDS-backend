@@ -637,9 +637,10 @@ public class DatasetController {
 			 	
 			    
 	            System.out.println("File uploaded successfuly");
-	           
+	            long file_size = FileChannel.open(tempFile).size();
+	            
 	            //save the file in db
-	            long dataFileId = saveUploadedFile("/datasetFile", resumableFilename.split(",")[0]);
+	            long dataFileId = saveUploadedFile("/datasetFile", resumableFilename.split(",")[0], file_size);
 	            
 	            //save the file in system with the name as file id
 	            Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
@@ -665,7 +666,7 @@ public class DatasetController {
 	 * SAVE THE UPLOADED FILE
 	 */
 	
-	private long saveUploadedFile(String filePath, String orginalFileName) throws SQLException {
+	private long saveUploadedFile(String filePath, String orginalFileName, long file_size) throws SQLException {
 		
 		DataFile dataFile = new DataFile();
 		
@@ -676,6 +677,8 @@ public class DatasetController {
 		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null); //in progress
 		
 		dataFile.setOrigFileName(orginalFileName);	
+		
+		dataFile.setSize(file_size);
 		
 		dataFile.setDataType(dataType);
 		
@@ -700,7 +703,7 @@ public class DatasetController {
 		Dataset dataSet = datasetDAO.findById(dataFileInfo.getDataset_id()).orElse(null);
 		
 		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
-		
+		System.out.println(dataFileInfo.getData_type_id());
 		if(dataFile == null)
 			throw new IllegalArgumentException("File id not valid");
 		
