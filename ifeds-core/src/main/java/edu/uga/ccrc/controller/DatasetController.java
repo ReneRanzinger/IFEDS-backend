@@ -669,8 +669,6 @@ public class DatasetController {
 	private long saveUploadedFile(String filePath, String orginalFileName, long file_size) throws SQLException {
 		
 		DataFile dataFile = new DataFile();
-		
-		//Dummy datasetid and dataTypeId
 	
 		long dataset_type_id = 1;
 		
@@ -696,7 +694,7 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
-	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException {
+	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException {
 		System.out.println("Inside save file");
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		
@@ -704,6 +702,7 @@ public class DatasetController {
 		
 		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
 		System.out.println(dataFileInfo.getData_type_id());
+		
 		if(dataFile == null)
 			throw new IllegalArgumentException("File id not valid");
 		
@@ -714,9 +713,18 @@ public class DatasetController {
 		if(dataType == null)
 			throw new IllegalArgumentException("DataType id not valid");
 		
+		
 		dataFile.setDataset(dataSet);
 		dataFile.setDataType(dataType);
 		dataFile.setDescription(dataFileInfo.getDescription());
+
+		//check if dataset has same file already exist in database
+		DataFile duplicateDataFile = dataFileDAO.checkIfDuplicateFile(dataFileInfo.getDataset_id(), dataFile.getOrigFileName());
+		
+		//duplicate entry
+		if(duplicateDataFile != null)
+			throw new SQLException("Duplicate file name! File with same name, assigned to same dataset exists already");
+		
 		try {
 			dataFileDAO.save(dataFile);
 			return "Success";
