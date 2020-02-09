@@ -111,7 +111,7 @@ CREATE TABLE core.data_file
 	data_type_id integer NOT NULL REFERENCES core.data_type ON UPDATE CASCADE ON DELETE CASCADE,
 	original_file_name VARCHAR(64) NOT NULL,
 	description VARCHAR(1000),
-	data_file_size integer NOT NULL
+	data_file_size integer  NULL
 
 
 );
