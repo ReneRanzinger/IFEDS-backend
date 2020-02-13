@@ -12,6 +12,8 @@ public class DataFileBean{
 	
 	private String description;
 	
+	private Long data_file_size;
+	
 	public DataFileBean(DataFile f) {
 		this.dataFileId=f.getDataFileId();
 		this.dataType=new DataTypeBean(f.getDataType());
@@ -49,6 +51,14 @@ public class DataFileBean{
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Long getSize() {
+		return data_file_size;
+	}
+
+	public void setSize(Long size) {
+		this.data_file_size = size;
 	}
 
 }

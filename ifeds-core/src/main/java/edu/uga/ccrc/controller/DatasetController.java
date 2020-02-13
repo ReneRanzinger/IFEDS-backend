@@ -1,9 +1,12 @@
 
 package edu.uga.ccrc.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -702,10 +705,13 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
+<<<<<<< HEAD
 	@ApiOperation(value = "Save File information", response = DataFileInfoBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+=======
+>>>>>>> 8bea94299b2fbfda6d88b08ba5d6316f56e172d7
 	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);

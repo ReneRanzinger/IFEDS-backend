@@ -11,9 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name="data_file", schema="core",
-	    uniqueConstraints=
-	        @UniqueConstraint(columnNames={"dataset_id"})
+@Table(name="data_file", schema="core"
 	)
 public class DataFile {
 	
@@ -36,6 +34,9 @@ public class DataFile {
 	
 	@Column(name="description", length=1000)
 	private String description;
+	
+	@Column(name="data_file_size")
+	private Long data_file_size;
 	
 	public DataFile() {}
 
@@ -77,5 +78,13 @@ public class DataFile {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Long getSize() {
+		return data_file_size;
+	}
+
+	public void setSize(Long size) {
+		this.data_file_size = size;
 	}
 }
