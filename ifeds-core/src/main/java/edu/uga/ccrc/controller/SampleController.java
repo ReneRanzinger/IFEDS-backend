@@ -37,6 +37,10 @@ import edu.uga.ccrc.view.bean.CreateSampleToSampleDescriptorHelperBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.SampleBean;
 import edu.uga.ccrc.view.bean.SampleToSampleDescriptorBean;
+import edu.uga.ccrc.view.bean.SampleTypeBean;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 public class SampleController {
@@ -59,6 +63,10 @@ public class SampleController {
 	private JwtTokenUtil jwtTokenUtil;
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getSample", produces="application/json")
+	@ApiOperation(value = "Get Sample", response = SampleBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the sample is forbidden"),
+			@ApiResponse(code = 404, message = "The sample resource is not found") })
 	public List<SampleBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
 		
 		System.out.println("Retrieving provider's uploaded dataset information : getSamples() ");
@@ -102,6 +110,10 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
+	@ApiOperation(value = "Get Sample Id", response = SampleBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the sample id is forbidden"),
+			@ApiResponse(code = 404, message = "The sample id resource is not found") })
 	public SampleBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response){
 		
 		
@@ -140,6 +152,10 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
+	@ApiOperation(value = "Create Sample", response = CreateSampleHelperBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Creating the sample is forbidden"),
+			@ApiResponse(code = 404, message = "The sample is not created") })
 	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException, EntityNotFoundException{
 	
 		System.out.println("In Create Sample : ");
@@ -209,6 +225,10 @@ public class SampleController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")
+	@ApiOperation(value = "Update Sample", response = CreateSampleHelperBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Updating the sample is forbidden"),
+			@ApiResponse(code = 404, message = "The sample is not updated") })
 	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update Sample : ");
@@ -282,6 +302,7 @@ public class SampleController {
 	
 	
 	@RequestMapping(method = RequestMethod.DELETE, value = "/samples/{id}", produces="application/json")
+	@ApiOperation(value = "Delete Sample", response = List.class)
 	public List<String> deleteSample(@PathVariable Long id) throws EntityNotFoundException {
 		List<String> res = new ArrayList<>();
 		if(sampleDAO.findById(id).orElse(null) == null)
