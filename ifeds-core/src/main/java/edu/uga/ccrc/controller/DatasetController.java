@@ -319,6 +319,10 @@ public class DatasetController {
 	 * 
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/datasets", produces="application/json")
+	@ApiOperation(value = "Create a dataset", response = Dataset.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not created") })
 	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException {
 		
 		
@@ -472,6 +476,10 @@ public class DatasetController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/datasets/{id}", produces="application/json")
+	@ApiOperation(value = "Update Dataset", response = Dataset.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Updating the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update dataset : ");
@@ -637,9 +645,10 @@ public class DatasetController {
 			 	
 			    
 	            System.out.println("File uploaded successfuly");
-	           
+	            long file_size = FileChannel.open(tempFile).size();
+	            
 	            //save the file in db
-	            long dataFileId = saveUploadedFile("/datasetFile", resumableFilename.split(",")[0]);
+	            long dataFileId = saveUploadedFile("datasetFile", resumableFilename.split(",")[0], file_size);
 	            
 	            //save the file in system with the name as file id
 	            Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
@@ -665,17 +674,17 @@ public class DatasetController {
 	 * SAVE THE UPLOADED FILE
 	 */
 	
-	private long saveUploadedFile(String filePath, String orginalFileName) throws SQLException {
+	private long saveUploadedFile(String filePath, String orginalFileName, long file_size) throws SQLException {
 		
 		DataFile dataFile = new DataFile();
-		
-		//Dummy datasetid and dataTypeId
 	
 		long dataset_type_id = 1;
 		
 		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null); //in progress
 		
 		dataFile.setOrigFileName(orginalFileName);	
+		
+		dataFile.setSize(file_size);
 		
 		dataFile.setDataType(dataType);
 		
@@ -693,27 +702,41 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
-	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException {
+	@ApiOperation(value = "Save File information", response = DataFileInfoBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The dataset resource is not found") })
+	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		
 		Dataset dataSet = datasetDAO.findById(dataFileInfo.getDataset_id()).orElse(null);
 		
 		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
+		System.out.println(dataFileInfo.getData_type_id());
 		
 		if(dataFile == null)
-			throw new IllegalArgumentException("File id not valid");
+			throw new EntityNotFoundException("File id not valid");
 		
 		if(dataSet == null)
-			throw new IllegalArgumentException("Dataset id not valid");
+			throw new EntityNotFoundException("Dataset id not valid");
 		
 	
 		if(dataType == null)
-			throw new IllegalArgumentException("DataType id not valid");
+			throw new EntityNotFoundException("DataType id not valid");
+		
 		
 		dataFile.setDataset(dataSet);
 		dataFile.setDataType(dataType);
 		dataFile.setDescription(dataFileInfo.getDescription());
+
+		//check if dataset has same file already exist in database
+		DataFile duplicateDataFile = dataFileDAO.checkIfDuplicateFile(dataFileInfo.getDataset_id(), dataFile.getOrigFileName());
+		
+		//duplicate entry
+		if(duplicateDataFile != null)
+			throw new SQLException("Duplicate file name! File with same name, assigned to same dataset exists already");
+		
 		try {
 			dataFileDAO.save(dataFile);
 			return "Success";
@@ -731,10 +754,62 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.GET, value = "/dataTypes", produces="application/json")
+	@ApiOperation(value = "Return Data-Type List", response = List.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the data-type list is forbidden"),
+			@ApiResponse(code = 404, message = "The resource is not found") })
 	public List<DataType> getDataTypeList() {
 		
 		List<DataType> dataTypes = dataTypeDAO.findAll();
 		return dataTypes;
+	}
+	
+	/*
+	 * 
+	 * Return data-type list
+	 */
+
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
+	public String deleteUploadedFile(@PathVariable Long id) throws NoResponeException, EntityNotFoundException {
+		System.out.println("In delete file");
+		
+			if(!dataFileDAO.existsById(id))
+				throw new EntityNotFoundException("File id doesn't exist");
+			
+			deletePhysicalFile(id);
+			try {
+			dataFileDAO.deleteById(id);
+			}catch(Exception e){
+				throw new NoResponeException("Something went wrong. Please try after sometime");
+			}
+			
+			return "Deleted";
+			
+		
+		
+	}
+
+	private void deletePhysicalFile(Long id) throws EntityNotFoundException {
+		// TODO Auto-generated method stub
+		try
+        { 
+			System.out.println("In delete physical file" +id);
+            Files.delete(Paths.get("datasetFile/"+id)); 
+        } 
+        catch(NoSuchFileException e) 
+        { 
+            throw new EntityNotFoundException("No such file/directory exists"); 
+        } 
+        catch(DirectoryNotEmptyException e) 
+        { 
+            throw new EntityNotFoundException("Directory is not empty."); 
+        } 
+        catch(IOException e) 
+        { 
+            throw new EntityNotFoundException("Invalid permissions."); 
+        } 
+          
 	}
 	
 	
