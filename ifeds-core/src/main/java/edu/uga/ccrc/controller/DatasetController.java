@@ -319,10 +319,6 @@ public class DatasetController {
 	 * 
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/datasets", produces="application/json")
-	@ApiOperation(value = "Create a dataset", response = Dataset.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
-			@ApiResponse(code = 404, message = "The dataset resource is not created") })
 	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException {
 		
 		
@@ -476,10 +472,6 @@ public class DatasetController {
 	}
 	
 	@RequestMapping(method = RequestMethod.PUT, value = "/datasets/{id}", produces="application/json")
-	@ApiOperation(value = "Update Dataset", response = Dataset.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 403, message = "Updating the dataset is forbidden"),
-			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update dataset : ");
@@ -701,10 +693,6 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/dataset/file/save_info", produces="application/json")
-	@ApiOperation(value = "Save File information", response = DataFileInfoBean.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
-			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException {
 		System.out.println("Inside save file");
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
@@ -743,10 +731,6 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.GET, value = "/dataTypes", produces="application/json")
-	@ApiOperation(value = "Return Data-Type List", response = List.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 403, message = "Accessing the data-type list is forbidden"),
-			@ApiResponse(code = 404, message = "The resource is not found") })
 	public List<DataType> getDataTypeList() {
 		
 		List<DataType> dataTypes = dataTypeDAO.findAll();

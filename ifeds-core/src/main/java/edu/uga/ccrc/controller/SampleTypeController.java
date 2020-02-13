@@ -11,11 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.uga.ccrc.dao.SampleTypeDAO;
 import edu.uga.ccrc.entity.SampleType;
-import edu.uga.ccrc.view.bean.SampleDescriptorBean;
 import edu.uga.ccrc.view.bean.SampleTypeBean;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import edu.uga.ccrc.dao.SampleDescriptorDAO;
 
 @RestController
@@ -29,10 +25,6 @@ public class SampleTypeController {
 	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/SampleTypes", produces="application/json")
-	@ApiOperation(value = "Get Sample Type", response = SampleTypeBean.class)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 403, message = "Accessing the sample type is forbidden"),
-			@ApiResponse(code = 404, message = "The sample type resource is not found") })
 	public List<SampleTypeBean> listAllSampleType(){
 		System.out.println("Getting Sample Types");
 		List<SampleTypeBean> result = new ArrayList<>();
