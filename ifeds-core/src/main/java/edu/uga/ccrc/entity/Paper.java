@@ -7,12 +7,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import edu.uga.ccrc.view.bean.PaperBean;
+
 @Entity
 @Table(name="paper", schema="core")
 public class Paper {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name="paper_id", nullable=false)
 	private Long paperId;
 	
@@ -31,7 +32,18 @@ public class Paper {
 	@Column(length=256, nullable=false)
 	private String url;
 	
-	protected Paper() {}
+	public Paper() {}
+	public Paper(PaperBean paperBean) {
+		
+		this.paperId = paperBean.getPmid();
+		this.title = paperBean.getTitle();
+		this.authorList = paperBean.getAuthorList();
+		this.journalName = paperBean.getJournalName();
+		this.pmid = paperBean.getPmid();
+		this.url = paperBean.getUrl();
+	}
+	
+	
 
 	public Long getPaperId() {
 		return paperId;

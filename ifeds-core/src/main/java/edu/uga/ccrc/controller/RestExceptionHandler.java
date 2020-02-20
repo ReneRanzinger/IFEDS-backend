@@ -52,9 +52,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleSQLException(SQLException ex,WebRequest request) {
 		ErrorDetails error = new ErrorDetails();
 		error.setTimestamp(new Date());
-		error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		error.setMessage(ex.getMessage());	
-		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoResponeException.class)

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +59,7 @@ public class SampleController {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	
+	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/getSample", produces="application/json")
 	public List<SampleBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
 		
@@ -101,6 +103,7 @@ public class SampleController {
 		
 	}
 	
+	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
 	public SampleBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response){
 		

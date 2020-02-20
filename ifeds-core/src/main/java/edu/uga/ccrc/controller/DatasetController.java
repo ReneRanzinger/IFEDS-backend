@@ -192,9 +192,14 @@ public class DatasetController {
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/datasets/{id}", produces = "application/json")
 	@ApiOperation(value = "Delete a dataset")
-	public void deleteDataset(@PathVariable long id) {
+	public void deleteDataset(@PathVariable long id) throws SQLException {
 		System.out.println("Deleting datasets : deleteDataset() id : " + id);
+		Dataset d = datasetDAO.findById(id).orElse(null);
+		if(d == null)
+			throw new SQLException("Dataset id not valid");
+		
 		datasetDAO.deleteById(id);
+	
 	}
 
 	@CrossOrigin
@@ -326,7 +331,7 @@ public class DatasetController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not created") })
-	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException {
+	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResponeException {
 		
 		
 		System.out.println("In create dataset : ");
@@ -357,11 +362,14 @@ public class DatasetController {
 		dataset.setDescription(createDatasetHelperBean.getDescription());
 		
 		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
-
+		
+		if(datasetDAO.findByName(createDatasetHelperBean.getDatasetName()) != null)
+			throw new SQLException("Duplicate Name. Dataset with same name already exists!");
+		
 		try {
 			dataset = datasetDAO.save(dataset);
 		}catch(Exception e) {
-			throw new SQLException(e.getLocalizedMessage());
+			throw new NoResponeException("Something went Wrong could not save the dataset");
 		}
 		
 		

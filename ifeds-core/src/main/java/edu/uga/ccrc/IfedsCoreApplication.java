@@ -3,11 +3,13 @@ package edu.uga.ccrc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 
 @SpringBootApplication
+@CrossOrigin
 public class IfedsCoreApplication {
 
 	public static void main(String[] args) throws NoResponeException {
