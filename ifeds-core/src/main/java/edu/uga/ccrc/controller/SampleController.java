@@ -38,6 +38,7 @@ import edu.uga.ccrc.view.bean.CreateSampleToSampleDescriptorHelperBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.SampleBean;
 import edu.uga.ccrc.view.bean.SampleToSampleDescriptorBean;
+import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
 
 @RestController
 public class SampleController {
@@ -105,15 +106,18 @@ public class SampleController {
 	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
-	public SampleBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response){
+	public SampleWithDescriptorListBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response) throws EntityNotFoundException{
 		
 		
 		System.out.println("in samples/id");
 		
 		//get sample
 		Sample sample = sampleDAO.findById(id).orElse(null);
-		if(sample == null) return null; //no sample found
+		if(sample == null) throw new EntityNotFoundException("Sample id invalid	"); //no sample found
 		
+		
+		SampleWithDescriptorListBean sb = new SampleWithDescriptorListBean(sample);
+		/*
 		//result list
 		SampleBean result = new SampleBean(sample);
 		
@@ -136,9 +140,9 @@ public class SampleController {
 		
 		//add all sample descriptor to result bean
 		result.setSampleToSameDescriptorBean(sdBean);
+		*/
 		
-		
-		return result;
+		return sb;
 		
 	}
 	
