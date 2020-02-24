@@ -1,6 +1,7 @@
 FROM alpine/git as clone 
 WORKDIR /app
 RUN git clone https://github.com/ReneRanzinger/IFEDS-backend.git
+RUN cd /app/IFEDS-backend/ifeds-core ; git checkout master
 
 FROM maven:3.5-jdk-8-alpine as build
 
