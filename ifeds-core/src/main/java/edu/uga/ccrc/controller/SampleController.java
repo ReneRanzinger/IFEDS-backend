@@ -39,7 +39,7 @@ import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.SampleBean;
 import edu.uga.ccrc.view.bean.SampleToSampleDescriptorBean;
 import edu.uga.ccrc.view.bean.SampleWithDescriptorListBean;
-
+@CrossOrigin
 @RestController
 public class SampleController {
 	@Autowired

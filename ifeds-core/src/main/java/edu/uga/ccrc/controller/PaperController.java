@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 
-
+@CrossOrigin
 @RestController
 public class PaperController {
 	@Autowired

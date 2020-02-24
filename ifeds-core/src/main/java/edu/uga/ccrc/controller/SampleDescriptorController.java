@@ -15,6 +15,7 @@ import edu.uga.ccrc.entity.SampleType;
 import edu.uga.ccrc.view.bean.SampleDescriptorBean;
 import edu.uga.ccrc.view.bean.SampleTypeBean;
 
+@CrossOrigin
 @RestController
 public class SampleDescriptorController {
 	@Autowired

@@ -14,6 +14,7 @@ import edu.uga.ccrc.entity.SampleType;
 import edu.uga.ccrc.view.bean.SampleTypeBean;
 import edu.uga.ccrc.dao.SampleDescriptorDAO;
 
+@CrossOrigin
 @RestController
 public class SampleTypeController {
 	

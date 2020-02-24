@@ -89,7 +89,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-
+@CrossOrigin
 @Api(value = "ifeds", description = "Operations pertaining to dataset")
 @RestController
 public class DatasetController {
