@@ -106,4 +106,12 @@ public class DatasetDetailBean{
 	public void setDataFiles(Set<DataFileBean> dataFiles) {
 		this.dataFiles = dataFiles;
 	}
+
+	@Override
+	public String toString() {
+		return "DatasetDetailBean [datasetId=" + datasetId + ", datasetName=" + datasetName + ", description="
+				+ description + ", sample=" + sample + ", provider=" + provider + ", experimentTypes=" + experimentTypes
+				+ ", papers=" + papers + ", keywords=" + keywords + ", fundingSources=" + fundingSources
+				+ ", dataFiles=" + dataFiles + "]";
+	}
 }
