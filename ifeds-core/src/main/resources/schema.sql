@@ -1,4 +1,4 @@
- CREATE SCHEMA IF NOT EXISTS core;
+CREATE SCHEMA IF NOT EXISTS core;
 CREATE TABLE IF NOT EXISTS core.provider
 (
 	provider_id serial NOT NULL PRIMARY KEY,
@@ -107,11 +107,12 @@ CREATE TABLE IF NOT EXISTS core.data_type
 CREATE TABLE IF NOT EXISTS core.data_file
 (
 	data_file_id serial NOT NULL PRIMARY KEY,
-	dataset_id integer NOT NULL REFERENCES core.dataset ON UPDATE CASCADE ON DELETE CASCADE,
+	dataset_id integer NULL REFERENCES core.dataset ON UPDATE CASCADE ON DELETE CASCADE,
 	data_type_id integer NOT NULL REFERENCES core.data_type ON UPDATE CASCADE ON DELETE CASCADE,
 	original_file_name VARCHAR(64) NOT NULL,
 	description VARCHAR(1000),
-	UNIQUE(dataset_id)
+	data_file_size integer  NULL
+
 
 );
 
