@@ -1,0 +1,16 @@
+version: '3.4'
+services:
+  jenkins-node:
+    build: .
+    image: aokinobu/jenkinsagent
+    ports:
+      - "2222:22"
+    volumes:
+      - /home/ifedsuser/.ssh:/home/jenkins/.ssh
+      - /home/ifedsuser/workspace:/home/ifedsuser/workspace
+      - /home/ifedsuser/ifeds:/home/ifedsuser/ifeds
+      - /var/run/docker.sock:/var/run/docker.sock
+#      - /var/lib/docker:/var/lib/docker
+#   environment:
+#        - JENKINS_SLAVE_SSH_PUBKEY
+    privileged: true
