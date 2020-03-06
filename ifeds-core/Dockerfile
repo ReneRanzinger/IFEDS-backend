@@ -1,16 +1,11 @@
-FROM alpine/git as clone 
-WORKDIR /app
-RUN git clone https://github.com/ReneRanzinger/IFEDS-backend.git
-RUN cd /app/IFEDS-backend/ifeds-core ; git checkout master
-
 FROM maven:3.5-jdk-8-alpine as build
 
 WORKDIR /app
-COPY --from=clone app/IFEDS-backend/ifeds-core/pom.xml /app
+COPY ./pom.xml /app
 RUN mvn verify clean --fail-never
 
 # Image layer: with the application
-COPY --from=clone app/IFEDS-backend/ifeds-core /app
+COPY . /app
 RUN mvn clean install -DskipTests
 
 FROM openjdk:8-alpine
