@@ -4,6 +4,8 @@ services:
     build: .
     ports:
       - 8080:8080
+    volumes:
+      - ${HOME}/ifeds/datasetfile:/datasetFile
     environment:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/ifeds}
       - SPRING_DATASOURCE_USERNAME=ifeds
