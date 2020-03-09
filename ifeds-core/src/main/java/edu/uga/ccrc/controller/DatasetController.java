@@ -226,7 +226,7 @@ public class DatasetController {
 	 * If user is not logged in (authorization token null) : returns only public datasets
 	 * 
 	 * */
-
+	
 	@CrossOrigin
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
 	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
@@ -524,7 +524,7 @@ public class DatasetController {
 	
 	/*
 	 * 
-	 * Update the already existsing dataset. The steps are pretty similar to create dataset except, in this case the dataset
+	 * Update the already existing dataset. The steps are pretty similar to create dataset except, in this case the dataset
 	 * is already present in the database
 	 * 
 	 * Following are the steps:
@@ -854,6 +854,7 @@ public class DatasetController {
 
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
+	@ApiOperation(value = "Delete a file")
 	public String deleteUploadedFile(@PathVariable Long id) throws NoResponeException, EntityNotFoundException {
 		System.out.println("In delete file");
 		

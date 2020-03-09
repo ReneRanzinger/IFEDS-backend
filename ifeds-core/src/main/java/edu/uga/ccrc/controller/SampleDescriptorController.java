@@ -14,6 +14,10 @@ import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.entity.SampleType;
 import edu.uga.ccrc.view.bean.SampleDescriptorBean;
 import edu.uga.ccrc.view.bean.SampleTypeBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 
 @CrossOrigin
 @RestController
@@ -23,6 +27,10 @@ public class SampleDescriptorController {
 	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/SampleDescriptors", produces="application/json")
+	@ApiOperation(value = "Get Sample Descriptors", response = SampleDescriptorBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the sample descriptors is forbidden"),
+			@ApiResponse(code = 404, message = "The sample descriptor resource is not found") })
 	public List<SampleDescriptorBean> listAllSampleDescriptors(){
 		List<SampleDescriptorBean> result = new ArrayList<>();
 		System.out.println("Getting Sample Descriptors");

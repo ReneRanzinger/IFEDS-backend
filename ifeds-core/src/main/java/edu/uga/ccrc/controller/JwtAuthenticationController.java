@@ -20,6 +20,10 @@ import edu.uga.ccrc.service.JwtUserDetailsService;
 import edu.uga.ccrc.view.bean.JwtRequestBean;
 import edu.uga.ccrc.view.bean.JwtResponseBean;
 import io.jsonwebtoken.MalformedJwtException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 
 
 @RestController
@@ -36,6 +40,10 @@ public class JwtAuthenticationController {
 	private JwtUserDetailsService userDetailsService;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	@ApiOperation(value = "Authenicate", response = ResponseEntity.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Authentication not allowed"),
+			@ApiResponse(code = 404, message = "Authentication failed") })
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequestBean authenticationRequest) throws Exception {
 		
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());

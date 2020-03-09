@@ -21,6 +21,10 @@ import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 
 @CrossOrigin
 @RestController
@@ -36,6 +40,10 @@ public class ProviderController {
 	private JwtTokenUtil jwtTokenUtil;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
+	@ApiOperation(value = "Get Provider Info", response = ProviderBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
+			@ApiResponse(code = 404, message = "The Provider Info is not found") })
 	public List<ProviderBean> findInformation() {
 		System.out.println("Retrieving provider information : findByUsername() ");
 		List<ProviderBean> result = new ArrayList<ProviderBean>();
@@ -53,6 +61,10 @@ public class ProviderController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/getProviderDatasets", produces="application/json")
+	@ApiOperation(value = "Get Provider Dataset", response = DatasetBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing provider dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The provider dataset is not found") })
 	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
 		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
 		
