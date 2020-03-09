@@ -39,7 +39,6 @@ public class ProviderController {
 	public List<ProviderBean> findInformation() {
 		System.out.println("Retrieving provider information : findByUsername() ");
 		List<ProviderBean> result = new ArrayList<ProviderBean>();
-		long id = 1;
 		Provider provider = providerDao.findByUsername("ccrc_user"); 
 		ProviderBean providerBean = new ProviderBean();
 		providerBean.setName(provider.getName());

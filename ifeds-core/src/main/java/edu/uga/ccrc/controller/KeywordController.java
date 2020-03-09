@@ -28,7 +28,7 @@ public class KeywordController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/keywords", produces = "application/json")
-	public Iterable<Keyword> getListOfExperimentType(HttpServletRequest request){
+	public Iterable<Keyword> getListOfKeywordController(HttpServletRequest request){
 		
 		
 		return keywordDAO.findAll();
