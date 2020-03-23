@@ -64,6 +64,11 @@ public class SampleController {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	
+	
+	/*
+	 * this method returns the list of the samples belonging to particular provider
+	 * 
+	 * */
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/getSample", produces="application/json")
 	@ApiOperation(value = "Get Sample", response = SampleBean.class)
@@ -112,6 +117,11 @@ public class SampleController {
 		
 	}
 	
+	/*
+	 * this method returns the list of the sample descriptor
+	 * 
+	 * */
+	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/samples/{id}", produces="application/json")
 	@ApiOperation(value = "Get Sample Id", response = SampleBean.class)
@@ -128,35 +138,20 @@ public class SampleController {
 		if(sample == null) throw new EntityNotFoundException("Sample id invalid	"); //no sample found
 		
 		
+		//prepare the bean
 		SampleWithDescriptorListBean sb = new SampleWithDescriptorListBean(sample);
-		/*
-		//result list
-		SampleBean result = new SampleBean(sample);
-		
-		
-		//get sample Descriptors
-		List<SampleToSampleDescriptor> sampleDescriptors = sampleToSampleDescriptorDAO.findSamepleDescriptorsBySampleId(sample.getSampleId());
-		
-		
-		List<SampleToSampleDescriptorBean> sdBean = new ArrayList<>();
-		
-		for(SampleToSampleDescriptor sampleDesc : sampleDescriptors) {
-			SampleToSampleDescriptorBean sampleToSampleDescriptorBean = new SampleToSampleDescriptorBean();
-			
-			sampleToSampleDescriptorBean.setSampleDescriptor(sampleDesc.getSampleDescriptor());
-			sampleToSampleDescriptorBean.setUnitOfMeasurement(sampleDesc.getUnitOfMeasurement());
-			sampleToSampleDescriptorBean.setValue(sampleDesc.getSampleToSampleDescPK().getSampleDescriptorValue());
-			sdBean.add(sampleToSampleDescriptorBean);
-			
-		}
-		
-		//add all sample descriptor to result bean
-		result.setSampleToSameDescriptorBean(sdBean);
-		*/
-		
+
 		return sb;
 		
 	}
+	
+	/*
+	 * this method create the new sample. All information from user is mapped to helper bean
+	 * Steps involved:
+	 * 1. Create sample
+	 * 2. Create sample to sampleDescriptor entries (m-n enteries)
+	 * 
+	 * */
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/samples", produces="application/json")
 	@ApiOperation(value = "Create Sample", response = CreateSampleHelperBean.class)
@@ -230,7 +225,14 @@ public class SampleController {
 	
 		
 	}
-	
+	/*
+	 * this method update the  sample. All information from user is mapped to helper bean
+	 * Steps involved:
+	 * 1. Create sample
+	 * 2.a Flush all the m-n entries in sampleDescriptors
+	 * 2.b Create sample to sampleDescriptor entries (m-n enteries)
+	 * 
+	 * */
 	@RequestMapping(method = RequestMethod.PUT, value = "/samples/{id}", produces="application/json")
 	@ApiOperation(value = "Update Sample", response = CreateSampleHelperBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
@@ -304,7 +306,10 @@ public class SampleController {
 	
 		
 	
-		
+	/*
+	 * Delete the sample with the id
+	 * 
+	 * */	
 	
 	
 	

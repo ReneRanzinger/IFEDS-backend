@@ -24,6 +24,11 @@ public class ExperimentTypeController {
 	@Autowired
 	ExperimentTypeDAO experimentTypeDAO;
 	
+
+	/*
+	 * this method returns list of experiment type
+	 * 
+	 * */
 	@ApiOperation(value = "View a list of experiment types", response = List.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Accessing the experiment type is forbidden"),

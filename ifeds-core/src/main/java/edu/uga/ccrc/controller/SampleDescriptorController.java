@@ -25,6 +25,9 @@ public class SampleDescriptorController {
 	@Autowired
 	SampleDescriptorDAO SampleDescriptorDAO;
 	
+	/*
+	 * the method returns list of sameDescriptors
+	 * */
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/SampleDescriptors", produces="application/json")
 	@ApiOperation(value = "Get Sample Descriptors", response = SampleDescriptorBean.class)

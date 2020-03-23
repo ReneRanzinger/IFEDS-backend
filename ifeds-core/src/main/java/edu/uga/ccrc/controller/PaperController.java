@@ -38,11 +38,23 @@ import io.swagger.annotations.ApiResponses;
 public class PaperController {
 	@Autowired
 	PaperDAO paperDAO;
+	
+
+	/*
+	 * this method gets information from the PubMed. It makes API call to the PubMed server to get the information
+	 * about the paper. 
+	 * 
+	 * 1. It checks if pubmed id already exists in the db
+	 * 2.a If not exists, then make API call to PubMed server to get meta information about the paper
+	 * 2.b If exists, then just return the information
+	 * 
+	 * */
 	@ApiOperation(value = "Returns meta information about paper", response = PaperBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"), 
 			@ApiResponse(code = 500, message = "Internal server error"),
 			@ApiResponse(code = 404, message = "Paper with given pubmed id not found/valid")}
 	)
+	
 	
 	@CrossOrigin
 	@GetMapping(value = "/paper_mata_data/{pmid}", produces = "application/json")
@@ -92,6 +104,12 @@ public class PaperController {
 		return paperBean;
 	}
 	
+
+/*
+ * this method save the meta information obtained by API call to PubMed in the database
+ * 
+ * */
+	
 	private void savePaperToDB(PaperBean paperBean, long pmid) throws NoResponeException {
 
 		if(paperDAO.findById(pmid) != null || paperDAO.findByPMId(pmid) != null) {
@@ -106,7 +124,11 @@ public class PaperController {
 		}
 		
 	}
-
+	/*
+	 * the helper method to parse the JSON, recieved on successful API call
+	 * 
+	 * */
+		
 	private static String readAll(Reader rd) throws IOException {
 	    StringBuilder sb = new StringBuilder();
 	    int cp;
@@ -116,6 +138,10 @@ public class PaperController {
 	    return sb.toString();
 	  }
 
+	/*
+	 * the helper method to parse the JSON, recieved on successful API call
+	 * 
+	 * */
 	private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
 	    InputStream is = new URL(url).openStream();
 	    try {

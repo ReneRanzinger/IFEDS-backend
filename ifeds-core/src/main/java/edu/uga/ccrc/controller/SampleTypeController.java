@@ -28,6 +28,11 @@ public class SampleTypeController {
 	@Autowired
 	SampleDescriptorDAO SampleDescriptorDAO;
 	
+	/*
+	 * the method returns list of Sample Types
+	 * 
+	 * */
+	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/SampleTypes", produces="application/json")
 	@ApiOperation(value = "Get Sample Type", response = SampleTypeBean.class)
