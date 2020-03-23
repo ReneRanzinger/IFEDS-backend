@@ -146,3 +146,10 @@ CREATE TABLE core.funding_grant
 	url VARCHAR(256),
 	PRIMARY KEY(dataset_id, funding_source_id,grant_number)
 );
+
+CREATE TABLE core.settings
+(
+    sr_no serial PRIMARY KEY,
+    key VARCHAR (300) NOT NULL UNIQUE,
+    value VARCHAR (300)
+);
