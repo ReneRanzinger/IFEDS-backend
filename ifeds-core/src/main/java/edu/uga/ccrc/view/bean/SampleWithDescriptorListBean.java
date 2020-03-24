@@ -5,12 +5,15 @@ import java.util.Set;
 
 import edu.uga.ccrc.entity.Sample;
 import edu.uga.ccrc.entity.SampleToSampleDescriptor;
+import edu.uga.ccrc.entity.SampleType;
 
 public class SampleWithDescriptorListBean {
 	
 	private Long sampleId;
 	
 	private String name;
+	
+	private Long sample_type_id;
 	
     private String description;
 		
@@ -25,6 +28,7 @@ public class SampleWithDescriptorListBean {
     	this.name=sample.getName();
     	this.description=sample.getDescription();
     	this.url=sample.getUrl();
+    	this.setSample_type_id(sample.getSampleType().getSampleTypeId());
     	
     	sampleDescriptors=new HashSet<SampleToSampleDescriptorBean>();
     	Set<SampleToSampleDescriptor> ssd=sample.getSampleToSampleDescriptors();
@@ -75,6 +79,14 @@ public class SampleWithDescriptorListBean {
 
 	public void setSampleDescriptors(Set<SampleToSampleDescriptorBean> sampleDescriptors) {
 		this.sampleDescriptors = sampleDescriptors;
+	}
+
+	public Long getSample_type_id() {
+		return sample_type_id;
+	}
+
+	public void setSample_type_id(Long sample_type_id) {
+		this.sample_type_id = sample_type_id;
 	}
     
     /*public void setDescriptor(Set<SampleToSampleDescriptor> sampleToSampleDesc){
