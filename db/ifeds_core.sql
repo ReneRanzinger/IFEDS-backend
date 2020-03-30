@@ -52,6 +52,8 @@ CREATE TABLE core.sample_to_sample_descriptor
 	PRIMARY KEY(sample_id,sample_descriptor_id,sample_descriptor_value )
 );
 
+
+
 CREATE TABLE core.experiment_type
 (
 	experiment_type_id serial NOT NULL PRIMARY KEY,	
@@ -152,4 +154,11 @@ CREATE TABLE core.settings
     sr_no serial PRIMARY KEY,
     key VARCHAR (300) NOT NULL UNIQUE,
     value VARCHAR (300)
+);
+
+CREATE TABLE core.permissions
+(
+    id serial PRIMARY KEY,
+    provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
+    permission_levels varchar(256)
 );
