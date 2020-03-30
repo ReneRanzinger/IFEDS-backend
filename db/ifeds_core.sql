@@ -160,5 +160,5 @@ CREATE TABLE core.permissions
 (
     id serial PRIMARY KEY,
     provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
-    permission_levels varchar(256)
+    permission_level varchar(256)
 );
