@@ -44,18 +44,20 @@ public class ProviderController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
 			@ApiResponse(code = 404, message = "The Provider Info is not found") })
-	public List<ProviderBean> findInformation() {
+	public ProviderBean findInformation(HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("Retrieving provider information : findByUsername() ");
-		List<ProviderBean> result = new ArrayList<ProviderBean>();
-		Provider provider = providerDao.findByUsername("ccrc_user"); 
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		Provider provider = providerDao.findByUsername(username); 
 		ProviderBean providerBean = new ProviderBean();
 		providerBean.setName(provider.getName());
 		providerBean.setEmail(provider.getEmail());
 		providerBean.setUsername(provider.getUsername());
 		providerBean.setProviderId(provider.getProviderId());
-		result.add(providerBean);
+	
 		
-		return result;
+		return providerBean;
 		
 		
 	}
