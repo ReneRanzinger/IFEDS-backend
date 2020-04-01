@@ -12,8 +12,11 @@ CREATE TABLE core.provider
 	password VARCHAR(64) NOT NULL,
 	email VARCHAR(32) NOT NULL UNIQUE,
 	auth_token VARCHAR(128),
-	auth_time_out integer
+	auth_time_out integer,
+	password_rest_token VARCHAR(256) UNIQUE,
+	active boolean DEFAULT true
 );
+
 
 CREATE TABLE core.sample_type
 (
