@@ -107,3 +107,7 @@ INSERT INTO core.settings(
 INSERT INTO core.settings(
 		key, value)
 	VALUES ('header.logo1', 'https://pngimage.net/wp-content/uploads/2018/06/logo-placeholder-png-2.png');
+	
+INSERT INTO core.permissions(
+		provider_id, permission_levels)
+	VALUES (1, 'admin');
