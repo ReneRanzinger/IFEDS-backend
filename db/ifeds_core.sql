@@ -13,7 +13,7 @@ CREATE TABLE core.provider
 	email VARCHAR(32) NOT NULL UNIQUE,
 	auth_token VARCHAR(128),
 	auth_time_out integer,
-	password_rest_token VARCHAR(256) UNIQUE,
+	password_reset_token VARCHAR(256) UNIQUE,
 	active boolean DEFAULT true
 );
 
@@ -154,14 +154,15 @@ CREATE TABLE core.funding_grant
 
 CREATE TABLE core.settings
 (
-    sr_no serial PRIMARY KEY,
+    settings_id serial PRIMARY KEY,
     key VARCHAR (300) NOT NULL UNIQUE,
-    value VARCHAR (300)
+    value VARCHAR (2048)
 );
 
 CREATE TABLE core.permissions
 (
-    id serial PRIMARY KEY,
+    permissions_id serial PRIMARY KEY,
     provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
-    permission_level varchar(256)
+    permission_level varchar(256) NOT NULL,
+    UNIQUE (provider_id, permission_level)
 );
