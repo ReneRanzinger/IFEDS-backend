@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,8 @@ import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
+import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import io.swagger.annotations.Api;
@@ -58,6 +61,58 @@ public class ProviderController {
 	
 		
 		return providerBean;
+		
+		
+	}
+	
+	@RequestMapping(method = RequestMethod.PUT, value = "/update_provider", produces="application/json")
+	@ApiOperation(value = "Updates Provider(User profile) Info", response = ProviderBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "SQL Exception"),
+			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
+			@ApiResponse(code = 404, message = "The Provider Info is not found") })
+	public String updateProviderInformation(HttpServletRequest request, HttpServletResponse response, @RequestBody ProviderBean providerBean) throws EntityNotFoundException, SQLException, NoResponeException {
+		
+		System.out.println("Updating provider information ");
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		
+		if(username == null)
+			throw new EntityNotFoundException("Invalid username");
+		
+		Provider provider = providerDao.findByUsername(username); 
+		
+		if(providerBean.getName().length() > 64)
+			throw new SQLException("Name should be less than 64 character");
+		provider.setName(providerBean.getName());
+		
+		if(providerBean.getAffiliation() != null && providerBean.getAffiliation().length() > 64)
+			throw new SQLException("Affilation should be less than 64 character");
+		provider.setAffiliation(providerBean.getAffiliation());
+
+		if(providerBean.getContact() != null && providerBean.getContact().length() > 32)
+			throw new SQLException("Contact should be less than 32 character");
+		provider.setContact(providerBean.getContact());
+		
+		if(providerBean.getDepartment() != null && providerBean.getDepartment().length() > 64)
+			throw new SQLException("Department should be less than 64 character");
+		provider.setDepartment(providerBean.getDepartment());
+
+		if(providerBean.getUrl() != null && providerBean.getUrl().length() > 256)
+			throw new SQLException("URL should be less than 256 character");
+		provider.setUrl(providerBean.getUrl());
+		
+		if(providerBean.getProviderGroup() != null && providerBean.getProviderGroup().length() > 64)
+			throw new SQLException("Groups should be less than 64 character");
+		provider.setProviderGroup(providerBean.getProviderGroup());
+
+		try {
+		providerDao.save(provider);}
+		catch(Exception e) {
+			throw new NoResponeException("Something went wrong");
+		}
+		return "{\n\t message : Successfully updated Provider's information \n}";
 		
 		
 	}
