@@ -23,7 +23,7 @@ public class Settings {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="sr_no", nullable=false)
+	@Column(name="settings_id", nullable=false)
 	private Long sr_no;
 	
 	
