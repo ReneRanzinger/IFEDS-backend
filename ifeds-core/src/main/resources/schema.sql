@@ -1,23 +1,4 @@
 CREATE SCHEMA IF NOT EXISTS core;
-DROP TABLE IF EXISTS core.permissions;
-DROP TABLE IF EXISTS core.settings;
-DROP TABLE IF EXISTS core.funding_grant;
-DROP TABLE IF EXISTS core.dataset_to_paper;
-DROP TABLE IF EXISTS core.dataset_to_keyword;
-DROP TABLE IF EXISTS core.dataset_to_experiment_type;
-DROP TABLE IF EXISTS core.data_file;
-DROP TABLE IF EXISTS core.data_type;
-DROP TABLE IF EXISTS core.dataset;
-DROP TABLE IF EXISTS core.funding_source;
-DROP TABLE IF EXISTS core.paper;
-DROP TABLE IF EXISTS core.keyword;
-DROP TABLE IF EXISTS core.experiment_type;
-DROP TABLE IF EXISTS core.sample_to_sample_descriptor;
-DROP TABLE IF EXISTS core.sample_descriptor;
-DROP TABLE IF EXISTS core.sample;
-DROP TABLE IF EXISTS core.sample_type;
-DROP TABLE IF EXISTS core.provider;
-
 CREATE TABLE IF NOT EXISTS core.provider
 (
 	provider_id serial NOT NULL PRIMARY KEY,

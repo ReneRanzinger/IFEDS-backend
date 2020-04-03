@@ -25,6 +25,7 @@ VALUES
 
 INSERT INTO core.data_type(name,description)
 VALUES
+	('in progress','in progress data file.'),
 	('MS','Mass spectrometry data file.'),
 	('NMR','NMR data file.'),
 	('LC','Liquid chromatography data file.'),
@@ -98,3 +99,15 @@ VALUES
 	(1,1,'MP-hStem10std_120424130807_xt.raw','eXtract quantification file for the MS run'),
 	(1,5,'MP-hStem10std-GRITS-annotation.zip','GRITS Toolbox annotation of the MS run'),
 	(1,5,'MP-hStem10std-SimGlycan.csv','SimGlycan annotaiton of the MS run');
+
+INSERT INTO core.settings(
+		key, value)
+	VALUES ('header.name', 'IFED');
+	
+INSERT INTO core.settings(
+		key, value)
+	VALUES ('header.logo1', 'https://pngimage.net/wp-content/uploads/2018/06/logo-placeholder-png-2.png');
+	
+INSERT INTO core.permissions(
+		provider_id, permission_level)
+	VALUES (1, 'admin');
