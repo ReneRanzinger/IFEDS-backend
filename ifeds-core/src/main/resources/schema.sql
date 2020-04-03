@@ -146,3 +146,17 @@ CREATE TABLE IF NOT EXISTS core.funding_grant
 	url VARCHAR(256),
 	PRIMARY KEY(dataset_id, funding_source_id,grant_number)
 );
+CREATE TABLE IF NOT EXISTS core.settings
+(
+    settings_id serial PRIMARY KEY,
+    key VARCHAR (300) NOT NULL UNIQUE,
+    value VARCHAR (2048)
+);
+
+CREATE TABLE IF NOT EXISTS core.permissions
+(
+    permissions_id serial PRIMARY KEY,
+    provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
+    permission_level varchar(256) NOT NULL,
+    UNIQUE (provider_id, permission_level)
+);

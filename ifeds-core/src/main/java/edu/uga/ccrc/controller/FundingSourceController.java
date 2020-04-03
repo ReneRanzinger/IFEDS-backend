@@ -20,6 +20,11 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 public class FundingSourceController {
 	
+	
+	/*
+	 * this method returns list of finding source
+	 * 
+	 * */
 
 	@Autowired
 	FundingSourceDAO fundingSourcetDAO;
@@ -28,7 +33,7 @@ public class FundingSourceController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/funding_sources", produces = "application/json")
-	public Iterable<FundingSource> getListOfExperimentType(HttpServletRequest request){
+	public Iterable<FundingSource> getListOfFundingsource(HttpServletRequest request){
 		
 		
 		return fundingSourcetDAO.findAll();

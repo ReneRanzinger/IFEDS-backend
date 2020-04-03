@@ -12,8 +12,11 @@ CREATE TABLE core.provider
 	password VARCHAR(64) NOT NULL,
 	email VARCHAR(32) NOT NULL UNIQUE,
 	auth_token VARCHAR(128),
-	auth_time_out integer
+	auth_time_out integer,
+	password_reset_token VARCHAR(256) UNIQUE,
+	active boolean DEFAULT true
 );
+
 
 CREATE TABLE core.sample_type
 (
@@ -51,6 +54,8 @@ CREATE TABLE core.sample_to_sample_descriptor
     unit_of_measurement VARCHAR (256),
 	PRIMARY KEY(sample_id,sample_descriptor_id,sample_descriptor_value )
 );
+
+
 
 CREATE TABLE core.experiment_type
 (
@@ -145,4 +150,19 @@ CREATE TABLE core.funding_grant
 	grant_number varchar(64) NOT NULL,
 	url VARCHAR(256),
 	PRIMARY KEY(dataset_id, funding_source_id,grant_number)
+);
+
+CREATE TABLE core.settings
+(
+    settings_id serial PRIMARY KEY,
+    key VARCHAR (300) NOT NULL UNIQUE,
+    value VARCHAR (2048)
+);
+
+CREATE TABLE core.permissions
+(
+    permissions_id serial PRIMARY KEY,
+    provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
+    permission_level varchar(256) NOT NULL,
+    UNIQUE (provider_id, permission_level)
 );

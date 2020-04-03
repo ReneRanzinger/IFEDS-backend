@@ -137,6 +137,16 @@ public class DatasetController {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
+	/*
+	 *  this method returns the dataset details. Not information in m-n tables
+	 * 
+	 * If user is logged in (authorization token present) : returns private (owned by current user) and public datasets
+	 * If user is not logged in (authorization token null) : returns only public datasets
+	 * 
+	 * 
+	 * 
+	 * 
+	 * */
 	@ApiOperation(value = "View a list of available datasets", response = List.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
@@ -189,6 +199,12 @@ public class DatasetController {
 		}
 		return res;
 	}
+	
+	/*
+	 * Delete the dataset with the particular id
+	 * 
+	 * 
+	 * */
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/datasets/{id}", produces = "application/json")
 	@ApiOperation(value = "Delete a dataset")
@@ -201,7 +217,16 @@ public class DatasetController {
 		datasetDAO.deleteById(id);
 	
 	}
-
+	
+	/*
+	 * this method returns the dataset details. This method returns all the information about the dataset
+	 * and the information in m-n tables.
+	 * 
+	 * If user is logged in (authorization token present) : returns private (owned by current user) and public datasets
+	 * If user is not logged in (authorization token null) : returns only public datasets
+	 * 
+	 * */
+	
 	@CrossOrigin
 	@GetMapping(value = "/dataset/{datasetId}", produces = "application/json")
 	@ApiOperation(value = "View dataset details", response = DatasetDetailBean.class)
@@ -258,7 +283,7 @@ public class DatasetController {
 				}
 			}
 		}
-		System.out.println(b.toString());
+
 		return b;
 	}
 
@@ -324,9 +349,19 @@ public class DatasetController {
 	
 	/*
 	 * 
-	 * CREATE DATASET
+	 * Create the new  dataset. 
 	 * 
-	 */
+	 * Following are the steps:
+	 * 
+	 * 1. Save the new dataset ( this step is first, because we need new dataset to present in database
+	 * 							 before making entries in m-n tables)
+	 * 2. Save dataset-to-funding-grant 
+	 * 3. Save dataset-to-experimentType
+	 * 4. Save dataset-to-keyWords
+	 * 5. Save dataset-to-paper
+	 * 
+	 *  
+	 * */
 	@RequestMapping(method = RequestMethod.POST, value = "/datasets", produces="application/json")
 	@ApiOperation(value = "Create a dataset", response = Dataset.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
@@ -487,6 +522,23 @@ public class DatasetController {
 	
 	}
 	
+	/*
+	 * 
+	 * Update the already existing dataset. The steps are pretty similar to create dataset except, in this case the dataset
+	 * is already present in the database
+	 * 
+	 * Following are the steps:
+	 * 
+	 * 1. Reterive the dataset with the particular id (id is @input param)
+	 * 2. Save dataset-to-funding-grant 
+	 * 3. Save dataset-to-experimentType
+	 * 4. Save dataset-to-keyWords
+	 * 5. Save dataset-to-paper
+	 * 
+	 *  Note: Before updating the entries, we are clearing all earlier entries in m-n tables
+	 * 
+	 * */
+	
 	@RequestMapping(method = RequestMethod.PUT, value = "/datasets/{id}", produces="application/json")
 	@ApiOperation(value = "Update Dataset", response = Dataset.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
@@ -495,6 +547,8 @@ public class DatasetController {
 	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException {
 		
 		System.out.println("In update dataset : ");
+		
+		//1. Reterive the dataset with the particular id
 		Dataset dataset = datasetDAO.findById(id).orElse(null);
 		
 		if(dataset == null) {
@@ -507,9 +561,9 @@ public class DatasetController {
 
 		dataset = datasetDAO.save(dataset);
 		
-				fundingGrantDAO.deleteFundingGrantByDatasetId(id);
-				//2)Save dataset-to-funding-grant 
-				for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
+		fundingGrantDAO.deleteFundingGrantByDatasetId(id);
+		//2)Save dataset-to-funding-grant 
+		for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
 					
 					//create composite PK
 					FundingGrantPK fundingGrantPK = new FundingGrantPK(dataset.getDatasetId(), fundGrant.getFunding_source_id(), fundGrant.getGrant_number());
@@ -532,12 +586,12 @@ public class DatasetController {
 					
 					fundingGrant = fundingGrantDAO.save(fundingGrant);
 					
-				}
+		}
 				
 				
-				datasetToExperimentTypeDAO.deleteDatasetToExperimentTypeByDatasetId(id);
-				//3)Save dataset-to-experimentType
-				for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
+		datasetToExperimentTypeDAO.deleteDatasetToExperimentTypeByDatasetId(id);
+		//3)Save dataset-to-experimentType
+		for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
 					
 					//get experiment type
 					ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
@@ -560,11 +614,9 @@ public class DatasetController {
 					datasetToExperimentType.setDescription(expTypeIdAndDes.getDescription());
 					datasetToExperimentType = datasetToExperimentTypeDAO.save(datasetToExperimentType);
 					
-				}
-				
-				//build composite pk
-				
-				//4)Save dataset-to-keyWords
+		 }
+					
+		//4)Save dataset-to-keyWords
 				datasetToKeywordDAO.deleteDatasetToKeywordByDatasetId(id);
 				for(Long keyWordId :createDatasetHelperBean.getKeywordsIds()) {
 					
@@ -590,9 +642,9 @@ public class DatasetController {
 				}
 				
 				
-				//5)Save dataset-to-paper
-				datasetToPaperDAO.deleteDatasetToPaperByDatasetId(id);
-				for(Long paperId : createDatasetHelperBean.getPaperIds()) {
+		 //5)Save dataset-to-paper
+		 datasetToPaperDAO.deleteDatasetToPaperByDatasetId(id);
+		 for(Long paperId : createDatasetHelperBean.getPaperIds()) {
 					
 					//get Paper
 					Paper paper = paperDAO.findById(paperId).orElse(null);
@@ -613,15 +665,23 @@ public class DatasetController {
 					
 					datasetToPaper = datasetToPaperDAO.save(datasetToPaper);
 					
-				}
+			}
 				
-				return "{\n\t Updated Dataset with id : " + dataset.getDatasetId() + "}";
+		return "{\n\t Updated Dataset with id : " + dataset.getDatasetId() + "}";
 				
 		
 	}
 	
 	/*
-	 * UPLOAD FILE
+	 * This method implements file upload mechansim in the multipart file. Please note, that files
+	 * info get saved in two parts
+	 * Part 1: Save uploaded file in temporary file, still all chunks are not arrived
+	 * Part 2: When its a last chunk, do the following:
+	 * 			1. Save the file in the database : which returns the file_id
+	 * 			2. Rename the temp file with file_id (to avoid duplicate file names) on the server
+	 * 
+	 * Definitions : 
+	 * META_INFO - It is the information of the file : dataset, description, data_type
 	 * 
 	 */
 	@ApiOperation(value = "Upload file", response = List.class)
@@ -638,11 +698,9 @@ public class DatasetController {
 			@RequestParam("resumableChunkSize") long resumableChunkSize,
             @RequestParam("resumableChunkNumber") int resumableChunkNumber,
             @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException, SQLException {
-		/* 
-		 
-       
-		*/
 		
+		
+		//save the file in the temporary file
 		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
 		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
 		 
@@ -653,6 +711,7 @@ public class DatasetController {
 	            }
 	      }
 		
+		 //if its a last chunk, then save the file in db and rename the file name
 		 if (resumableTotalChunks == resumableChunkNumber) {
 			 	
 			    
@@ -682,6 +741,9 @@ public class DatasetController {
 	}
 	
 	/*
+	 * Helper Method to saveUploadedFile to the database. When the file is saved in db, the file gets
+	 * file_id. The file_id is return by this method. The Invoking method then use this file_id to 
+	 * rename the file with file_id and store on the server
 	 * 
 	 * SAVE THE UPLOADED FILE
 	 */
@@ -690,26 +752,29 @@ public class DatasetController {
 		
 		DataFile dataFile = new DataFile();
 	
+
+		//in this case it is always 1. 1 === in_progress. As at this point of time we don't have meta information of the file
 		long dataset_type_id = 1;
 		
 		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null); //in progress
 		
-		dataFile.setOrigFileName(orginalFileName);	
+		dataFile.setOrigFileName(orginalFileName);//save original file name	
 		
-		dataFile.setSize(file_size);
+		dataFile.setSize(file_size);//set file_size
 		
-		dataFile.setDataType(dataType);
+		dataFile.setDataType(dataType); //in_progress
 		
-		dataFile = dataFileDAO.save(dataFile);
+		dataFile = dataFileDAO.save(dataFile); //save
 		
 	
-		
+		//return id
 		return dataFile.getDataFileId();
 		
 	}
 	/*
-	 * 
-	 * SAVE THE META INFO
+	 * This method is called when file has been uploaded to the server. This is the method, to provide the meta 
+	 * information of the file.
+	 * SAVE THE META INFO of the file. (dataset_id, description, data_type)
 	 */
 
 
@@ -720,13 +785,18 @@ public class DatasetController {
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
+		
+		//get dataFile
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		
+		//get dataset
 		Dataset dataSet = datasetDAO.findById(dataFileInfo.getDataset_id()).orElse(null);
 		
+		//get dataType
 		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
-		System.out.println(dataFileInfo.getData_type_id());
+		//System.out.println(dataFileInfo.getData_type_id());
 		
+		//check for exceptions
 		if(dataFile == null)
 			throw new EntityNotFoundException("File id not valid");
 		
@@ -738,6 +808,7 @@ public class DatasetController {
 			throw new EntityNotFoundException("DataType id not valid");
 		
 		
+		//set the entries
 		dataFile.setDataset(dataSet);
 		dataFile.setDataType(dataType);
 		dataFile.setDescription(dataFileInfo.getDescription());
@@ -777,12 +848,13 @@ public class DatasetController {
 	}
 	
 	/*
+	 * Deletes the uploaded file
 	 * 
-	 * Return data-type list
 	 */
 
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
+	@ApiOperation(value = "Delete a file")
 	public String deleteUploadedFile(@PathVariable Long id) throws NoResponeException, EntityNotFoundException {
 		System.out.println("In delete file");
 		
@@ -801,7 +873,10 @@ public class DatasetController {
 		
 		
 	}
-
+	/*
+	 * Helper Method
+	 * The method deletes the file from the server
+	 * */
 	private void deletePhysicalFile(Long id) throws EntityNotFoundException {
 		// TODO Auto-generated method stub
 		try

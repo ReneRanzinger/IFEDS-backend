@@ -22,13 +22,17 @@ public class KeywordController {
 	
 	@Autowired
 	KeywordDAO keywordDAO; 
-	
+
+	/*
+	 * this method returns list of keywords
+	 * 
+	 * */
 	
 	@ApiOperation(value = "View a list of keywords", response = List.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/keywords", produces = "application/json")
-	public Iterable<Keyword> getListOfExperimentType(HttpServletRequest request){
+	public Iterable<Keyword> getListOfKeywordController(HttpServletRequest request){
 		
 		
 		return keywordDAO.findAll();
