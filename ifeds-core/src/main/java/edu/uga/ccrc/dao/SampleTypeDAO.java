@@ -16,7 +16,7 @@ public interface SampleTypeDAO extends CrudRepository<SampleType, Long>{
 	
 	public List<SampleType> findAll();
 	
-	@Query(value="SELECT * FROM core.sample_type where sample_type_id = ?1",nativeQuery=true)
+	@Query(value="SELECT * FROM core.sample_type where sample_type_id = :sampleTypeId",nativeQuery=true)
 	SampleType findSampleTypeById(Long sampleTypeId);
 	
 
