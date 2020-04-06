@@ -11,6 +11,8 @@ public class DatasetBean {
 	private String providerName;
 	
 	private String description;
+	
+	private int num_of_files;
 
 	public Long getDatasetId() {
 		return datasetId;
@@ -50,6 +52,14 @@ public class DatasetBean {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public int getNum_of_files() {
+		return num_of_files;
+	}
+
+	public void setNum_of_files(int num_of_files) {
+		this.num_of_files = num_of_files;
 	}
 
 }

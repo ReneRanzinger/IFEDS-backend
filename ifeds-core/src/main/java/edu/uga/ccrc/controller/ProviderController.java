@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.uga.ccrc.config.JwtTokenUtil;
+import edu.uga.ccrc.dao.DataFileDAO;
 import edu.uga.ccrc.dao.DatasetDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.entity.Dataset;
@@ -22,6 +24,7 @@ import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
+import edu.uga.ccrc.service.JwtUserDetailsService;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import io.swagger.annotations.Api;
@@ -38,6 +41,9 @@ public class ProviderController {
 
 	@Autowired
 	DatasetDAO datasetDAO;
+	
+	@Autowired
+	DataFileDAO dataFileDAO;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -144,6 +150,8 @@ public class ProviderController {
 				b.setDescription(ds.getDescription());
 				b.setSampleName(ds.getSample().getName());
 				b.setProviderName(ds.getProvider().getName());
+				int number_of_files = dataFileDAO.numberOfDataFiles(ds.getDatasetId());
+				b.setNum_of_files(number_of_files);
 				result.add(b);	
 			}
 			
@@ -151,4 +159,6 @@ public class ProviderController {
 		return result;
 	
 	}
+	
+	
 }

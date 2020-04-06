@@ -106,8 +106,6 @@ public class SampleController {
 			sampleBean.setUrl(sample.getUrl());
 			sampleBean.setName(sample.getName());
 			sampleBean.setDescription(sample.getDescription());
-
-			
 			result.add(sampleBean);
 			
 		}
