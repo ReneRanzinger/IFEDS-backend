@@ -109,7 +109,7 @@ public class PaperController {
  * this method save the meta information obtained by API call to PubMed in the database
  * 
  * */
-	
+	@CrossOrigin
 	private void savePaperToDB(PaperBean paperBean, long pmid) throws NoResponeException {
 
 		if(paperDAO.findById(pmid) != null || paperDAO.findByPMId(pmid) != null) {
@@ -128,7 +128,7 @@ public class PaperController {
 	 * the helper method to parse the JSON, recieved on successful API call
 	 * 
 	 * */
-		
+	@CrossOrigin	
 	private static String readAll(Reader rd) throws IOException {
 	    StringBuilder sb = new StringBuilder();
 	    int cp;
@@ -142,6 +142,7 @@ public class PaperController {
 	 * the helper method to parse the JSON, recieved on successful API call
 	 * 
 	 * */
+	@CrossOrigin
 	private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
 	    InputStream is = new URL(url).openStream();
 	    try {

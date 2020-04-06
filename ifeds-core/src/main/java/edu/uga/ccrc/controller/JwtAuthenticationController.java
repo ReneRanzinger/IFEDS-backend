@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.uga.ccrc.config.JwtTokenUtil;
+import edu.uga.ccrc.dao.PermissionsDAO;
+import edu.uga.ccrc.dao.ProviderDAO;
+import edu.uga.ccrc.entity.Permissions;
+import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
 import edu.uga.ccrc.view.bean.JwtRequestBean;
@@ -38,6 +42,13 @@ public class JwtAuthenticationController {
 
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
+	@Autowired
+	PermissionsDAO permissionsDAO;
+	
+	
+	@Autowired
+	ProviderDAO providerDao;
+	
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	@ApiOperation(value = "Authenicate", response = ResponseEntity.class)
@@ -46,11 +57,16 @@ public class JwtAuthenticationController {
 			@ApiResponse(code = 404, message = "Authentication failed") })
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequestBean authenticationRequest) throws Exception {
 		
+		
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		final UserDetails userDetails = userDetailsService
 				.loadUserByUsername(authenticationRequest.getUsername());
 		final String token = jwtTokenUtil.generateToken(userDetails);
-			return ResponseEntity.ok(new JwtResponseBean(token));
+			Provider provider = providerDao.findByUsername(authenticationRequest.getUsername());
+			
+			String permission_level = permissionsDAO.findByProviderId(provider.getProviderId()).getPermission_level();
+			
+			return ResponseEntity.ok(new JwtResponseBean(token, permission_level));
 	}
 	
 	private void authenticate(String username, String password) throws Exception {

@@ -50,9 +50,11 @@ public class ProviderController {
 	public ProviderBean findInformation(HttpServletRequest request, HttpServletResponse response) {
 		System.out.println("Retrieving provider information : findByUsername() ");
 		final String requestTokenHeader = request.getHeader("Authorization");
+		
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 		Provider provider = providerDao.findByUsername(username); 
+		
 		ProviderBean providerBean = new ProviderBean();
 		providerBean.setName(provider.getName());
 		providerBean.setEmail(provider.getEmail());
