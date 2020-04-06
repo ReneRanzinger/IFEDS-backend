@@ -23,6 +23,8 @@ public interface SampleDAO extends CrudRepository<Sample, Long> {
 	 
 	 public Optional<Sample> findById(Long id);
 	 
+	
+	 
 	 
 	
 }

@@ -19,12 +19,14 @@ import edu.uga.ccrc.config.JwtTokenUtil;
 import edu.uga.ccrc.dao.DataFileDAO;
 import edu.uga.ccrc.dao.DatasetDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
+import edu.uga.ccrc.dao.SampleDAO;
 import edu.uga.ccrc.entity.Dataset;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
+import edu.uga.ccrc.view.bean.DashboardBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import io.swagger.annotations.Api;
@@ -44,6 +46,9 @@ public class ProviderController {
 	
 	@Autowired
 	DataFileDAO dataFileDAO;
+	
+	@Autowired
+	SampleDAO sampleDAO;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -160,5 +165,30 @@ public class ProviderController {
 	
 	}
 	
+	@RequestMapping(method = RequestMethod.GET, value = "/dashboard", produces="application/json")
+	@ApiOperation(value = "Dashboard WS", response = DashboardBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing provider dataset is forbidden"),
+			@ApiResponse(code = 404, message = "The provider dataset is not found") })
+	public DashboardBean getDashboardDetails(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
+		
+
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+
+		Provider provider = providerDao.findByUsername(username); 
+		DashboardBean db = new DashboardBean();
+		
+		int num_of_dataset = datasetDAO.findByProvider(provider.getProviderId());
+		int num_of_samples = sampleDAO.findSampleByProviderId(provider.getProviderId()).size();
+		
+		db.setNum_of_dataset(num_of_dataset);
+		db.setNum_of_samples(num_of_samples);
+		
+		return db;
+		
+	}
+
 	
 }
