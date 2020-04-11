@@ -100,7 +100,7 @@ public class PermissionsController {
 	public String updatePermissions(HttpServletRequest request, HttpServletResponse response, @PathVariable("action") String action, @PathVariable("id") Long provider_id) throws ForbiddenException, EntityNotFoundException, NoResponeException {
 		
 		System.out.println("Updating provider permission_level : updatePermissions() ");
-		System.out.println("Action:" + action);
+		//System.out.println("Action:" + action);
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
@@ -111,30 +111,30 @@ public class PermissionsController {
 		if(!userIsAdmin(username)) 
 			throw new ForbiddenException("You don't have access to this web service");
 		
-		Permissions p = permissionsDAO.findByProviderId(provider_id);
+		Permissions permission = permissionsDAO.findByProviderId(provider_id);
 		
 		//incase of demote, make sure that there is atleast one admin the permission table
-		if(p.getPermission_level().equals("admin") && action.equals("demote")) {
+		if(permission.getPermission_level().equals("admin") && action.equals("demote")) {
 			
-			if(permissionsDAO.findAdmin(provider_id) != null)
-				p.setPermission_level("enable");
+			if(permissionsDAO.getAdminOtherThanThisId(provider_id) != null)
+				permission.setPermission_level("default");
 			else
 				throw new ForbiddenException("Atleast one user should exist with admin permission level");
 		}
 			
 		//check if promote, then make the provider admin
 		else if(action.equals("promote"))
-			p.setPermission_level("admin");
+			permission.setPermission_level("admin");
 		
-		//check if promote, then make the provider enable
+		//check if enable, then make the provider active flag - enable
 		else if(action.equals("enable"))
-			p.setPermission_level("enable");
+			provider.setActive(true);
 		
 		//check if disable, then first make sure, that there is atleast on enable admin and then make the provider disable
 		else if(action.equals("disable")) {
 			
-			if(permissionsDAO.findAdmin(provider_id) != null)
-				p.setPermission_level("disable");
+			if(permissionsDAO.getAdminOtherThanThisId(provider_id) != null)
+				provider.setActive(false);
 			else
 				throw new ForbiddenException("You cannot disable admin user if only one admin exists");
 		}
@@ -144,7 +144,7 @@ public class PermissionsController {
 		
 		
 		try {
-			permissionsDAO.save(p);
+			permissionsDAO.save(permission);
 			return "{\n\t message: User permission successfuly updated \n}";
 		}catch(Exception e){
 			throw new NoResponeException("Error occured while updating to database");

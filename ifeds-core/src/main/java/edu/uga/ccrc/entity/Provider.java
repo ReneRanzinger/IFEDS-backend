@@ -57,11 +57,18 @@ public class Provider {
 	@Column(name="auth_time_out")
 	private Integer authTimeOut;
 	
+
+	@Column(name="active")
+	private boolean active;
+
+
 	@OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     Set<Sample> samples;
 	
 	@OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     Set<Dataset> datasets;
+	
+	
 	
 	protected Provider() {}
 
@@ -175,5 +182,14 @@ public class Provider {
 
 	public void setDatasets(Set<Dataset> datasets) {
 		this.datasets = datasets;
+	}
+	
+	
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 }

@@ -14,6 +14,6 @@ public interface PermissionsDAO extends CrudRepository<Permissions, Long> {
 	Permissions findByProviderId(Long provider_id);
 
 	@Query(value = "SELECT * FROM core.Permissions WHERE permission_level ='admin' and provider_id != :provider_id LIMIT 1", nativeQuery = true)
-	Permissions findAdmin(Long provider_id);
+	Permissions getAdminOtherThanThisId(Long provider_id);
 
 }
