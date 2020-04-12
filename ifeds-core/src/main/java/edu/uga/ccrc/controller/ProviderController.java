@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
+import edu.uga.ccrc.view.bean.ChangePasswordBean;
 import edu.uga.ccrc.view.bean.DashboardBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
@@ -189,6 +191,33 @@ public class ProviderController {
 		return db;
 		
 	}
+	@RequestMapping(method = RequestMethod.POST, value = "/change_password", produces="application/json")
+	@ApiOperation(value = "Change password", response = ChangePasswordBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "SQL Exception"),
+			@ApiResponse(code = 403, message = "Bad URL Request"),
+			@ApiResponse(code = 404, message = "Requested URL not found") })
+	public String Change_Password(HttpServletRequest request, HttpServletResponse response, @RequestBody ChangePasswordBean changePassword) throws EntityNotFoundException, SQLException, NoResponeException {
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		Provider provider = providerDao.findByUsername(username);
+		boolean userAuthenticate = passwordEncoder.matches(changePassword.getOld_password(), provider.getPassword());
+		if(userAuthenticate){	
+			try {
+				if(changePassword.getNew_password().length() > 64) 
+					throw new SQLException("Name should be less than 64 character");
+				provider.setPassword(passwordEncoder.encode(changePassword.getNew_password()));
+				providerDao.save(provider);
+				return "{\n\t Success \n}";
+			}
+			catch(Exception e ){
+				System.out.println("Old password doesn't match with user password");
+			}
+			
+		}
+		return "{\n\t Success \n}";
 
-	
+	}	
 }
