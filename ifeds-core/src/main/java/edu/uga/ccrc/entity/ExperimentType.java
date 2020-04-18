@@ -28,7 +28,13 @@ public class ExperimentType {
 	//@OneToMany(mappedBy = "experimentType")
     //Set<DatasetToExperimentType> datasetToExperimentTypeSet;
 	
-	protected ExperimentType() {}
+	public ExperimentType() {}
+	
+	public ExperimentType(String name, String description, String url) {
+		this.name = name;
+		this.description = description;
+		this.url = url;
+	}
 
 	public Long getExperimentTypeId() {
 		return experimentTypeId;

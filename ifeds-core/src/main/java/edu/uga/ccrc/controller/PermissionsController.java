@@ -31,14 +31,13 @@ import io.swagger.annotations.ApiResponses;
 @CrossOrigin
 @RestController
 public class PermissionsController {
-	
-	@Autowired
-	PermissionsDAO permissionsDAO;
-	
-
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
+	@Autowired
+	PermissionsDAO permissionsDAO;
+	
+	
 	@Autowired
 	ProviderDAO providerDao;
 	

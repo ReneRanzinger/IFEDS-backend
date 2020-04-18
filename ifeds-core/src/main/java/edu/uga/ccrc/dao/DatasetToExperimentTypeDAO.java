@@ -1,5 +1,7 @@
 package edu.uga.ccrc.dao;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,6 +19,9 @@ public interface DatasetToExperimentTypeDAO extends CrudRepository<DatasetToExpe
 	@Modifying
 	@Query(value="DELETE FROM core.dataset_to_experiment_type where dataset_id = ?1",nativeQuery=true)
 	public void deleteDatasetToExperimentTypeByDatasetId(Long id);
+
+	@Query(value="SELECT * FROM core.dataset_to_experiment_type where dataset_id = ?1",nativeQuery=true)
+	public List<DatasetToExperimentType> findByExperimentType(Long id);
 
 }
 

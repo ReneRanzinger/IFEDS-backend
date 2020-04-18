@@ -1,5 +1,7 @@
 package edu.uga.ccrc.dao;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,4 +19,7 @@ public interface DatasetToKeywordDAO extends CrudRepository<DatasetToKeyword, Lo
 	@Modifying
 	@Query(value="DELETE FROM core.dataset_to_keyword where dataset_id = ?1",nativeQuery=true)
 	public void deleteDatasetToKeywordByDatasetId(Long id);
+
+	@Query(value="SELECT * FROM core.dataset_to_keyword where keyword_id = ?1",nativeQuery=true)
+	public List<DatasetToKeywordDAO> findKeywordPresent(Long id);
 }

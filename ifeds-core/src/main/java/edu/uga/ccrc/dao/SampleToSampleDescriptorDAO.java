@@ -26,6 +26,10 @@ public interface SampleToSampleDescriptorDAO extends CrudRepository<SampleToSamp
 	
 	@Query(value="SELECT * FROM core.sample_to_sample_descriptor where sample_id = ?1",nativeQuery=true)
 	public List<SampleToSampleDescriptor> findSamepleDescriptorsBySampleId(Long id);
+
+	@Query(value="SELECT * FROM core.sample_to_sample_descriptor where sample_descriptor_id = ?1",nativeQuery=true)
+	public List<SampleToSampleDescriptor> findBySampleDescriptorId(Long id);
+
 	
 
 }

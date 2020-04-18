@@ -13,14 +13,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.uga.ccrc.config.JwtTokenUtil;
+import edu.uga.ccrc.dao.DatasetToExperimentTypeDAO;
+import edu.uga.ccrc.dao.DatasetToKeywordDAO;
+import edu.uga.ccrc.dao.ExperimentTypeDAO;
+import edu.uga.ccrc.dao.FundingGrantDAO;
 import edu.uga.ccrc.dao.FundingSourceDAO;
 import edu.uga.ccrc.dao.KeywordDAO;
+import edu.uga.ccrc.dao.PermissionsDAO;
+import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.dao.SampleDescriptorDAO;
+import edu.uga.ccrc.dao.SampleToSampleDescriptorDAO;
 import edu.uga.ccrc.entity.ExperimentType;
 import edu.uga.ccrc.entity.FundingSource;
 import edu.uga.ccrc.entity.Keyword;
+import edu.uga.ccrc.entity.Permissions;
+import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.exception.EntityNotFoundException;
+import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DatasetBean;
@@ -41,13 +52,60 @@ public class DictionaryController {
 	@Autowired
 	FundingSourceDAO fundingSourcetDAO;
 	
+	@Autowired
+	DatasetToKeywordDAO datasetToKeywordDAO;
 	
-	@ApiOperation(value = "View a list of dictionary valyes. Allowed Dictionary Names : 'keywords', 'funding_source', 'sample_descriptors' ", response = Object.class)
+	@Autowired
+	FundingGrantDAO fundingGrantDAO;
+	
+	@Autowired
+	SampleToSampleDescriptorDAO sampleToSampleDescriptorDAO;
+	
+	@Autowired
+	ExperimentTypeDAO experimentTypeDAO;
+	
+	@Autowired
+	DatasetToExperimentTypeDAO datasetToExperimentTypeDAO;
+	
+
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+	PermissionsDAO permissionsDAO;
+	
+	
+	@Autowired
+	ProviderDAO providerDao;
+	
+	private boolean userIsAdmin(String username) {
+		
+		Provider provider = providerDao.findByUsername(username);
+		
+		Permissions p = permissionsDAO.findByProviderId(provider.getProviderId());
+		System.out.println("Provider id : "+p.getPermission_level());
+		if(p.getPermission_level().equals("admin"))
+			return true;
+		
+		return false;
+		
+	}
+	
+	
+	@ApiOperation(value = "View a list of dictionary valyes. Allowed Dictionary Names : 'keywords','experiment_type', 'funding_source', 'sample_descriptors' ", response = Object.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@GetMapping(value = "/getDictionary/{dict_name}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public Object getDictionart(@PathVariable String dict_name ) throws NoResponeException, EntityNotFoundException{
+	public Object getDictionart(HttpServletRequest request, @PathVariable String dict_name ) throws NoResponeException, EntityNotFoundException, ForbiddenException{
+		
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		
+		if(!userIsAdmin(username))
+			throw new ForbiddenException("You don't have access to this web service");
+			
 		
 		if(dict_name.equals("keywords"))
 			return keywordDAO.findAll();
@@ -60,19 +118,32 @@ public class DictionaryController {
 		else if(dict_name.equals("sample_descriptors"))
 			return sampleDescriptorDAO.findAll();
 		
+		else if(dict_name.equals("experiment_type"))
+			return experimentTypeDAO.findAll();
+		
+		
+		
 		
 		throw new EntityNotFoundException("Wrong dictionary name");
 		
 	}
 	
 	
-	@ApiOperation(value = "	Add a value in dictionary. Allowed Dictionary Names : 'keywords', 'funding_source', 'sample_descriptors' ", response = Object.class)
+	@ApiOperation(value = "	Add a value in dictionary. Allowed Dictionary Names : 'keywords','experiment_type', 'funding_source', 'sample_descriptors' ", response = Object.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@PostMapping(value = "/dictionary/{dict_name}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public String setDictionary(@PathVariable String dict_name,@RequestBody DictionaryBean dictionary ) throws NoResponeException, EntityNotFoundException, SQLException{
+	public String setDictionary(HttpServletRequest request, @PathVariable String dict_name,@RequestBody DictionaryBean dictionary ) throws NoResponeException, EntityNotFoundException, SQLException, ForbiddenException{
 		
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		
+		
+		if(!userIsAdmin(username))
+			throw new ForbiddenException("You don't have access to this web service");
+			
 		if(dictionary.getName()== null)
 			throw new SQLException("Name is required field");
 		
@@ -130,6 +201,16 @@ public class DictionaryController {
 			sampleDescriptorDAO.save(sampleDescriptor);
 			return "{\n\t message: success \n}";
 		}
+		else if(dict_name.equals("experiment_type")) {
+			ExperimentType experimentType = new ExperimentType(dictionary.getName(),dictionary.getDescription(), dictionary.getUrl());
+		
+			if(experimentTypeDAO.findAllByName(dictionary.getName()).size() > 0)
+				throw new SQLException("Experiment Type with same name already exists");
+			
+			experimentTypeDAO.save(experimentType);
+			
+			return "{\n\t message: success \n}";
+		}
 		
 		
 		throw new EntityNotFoundException("Wrong dictionary name");
@@ -137,16 +218,25 @@ public class DictionaryController {
 	}
 	
 	
-	@ApiOperation(value = "	Add a value in dictionary. Allowed Dictionary Names : 'keywords', 'funding_source', 'sample_descriptors' ", response = Object.class)
+	@ApiOperation(value = "	Delete a dictionary entry. Allowed Dictionary Names : 'keywords', 'experiment_type','funding_source', 'sample_descriptors' ", response = Object.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success")})
 	@CrossOrigin
 	@DeleteMapping(value = "/dictionary/{dict_name}/{id}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public String delete(@PathVariable String dict_name, @PathVariable Long id) throws SQLException, EntityNotFoundException{
+	public String delete(HttpServletRequest request, @PathVariable String dict_name, @PathVariable Long id) throws SQLException, EntityNotFoundException, ForbiddenException{
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		
+		if(!userIsAdmin(username))
+			throw new ForbiddenException("You don't have access to this web service");
 		
 		if(dict_name.equals("keywords")) {
 			if(keywordDAO.findById(id).orElse(null) == null)
 				throw new SQLException("Keyword id does not exists");
+			
+			if(datasetToKeywordDAO.findKeywordPresent(id).size() > 0)
+				throw new SQLException("Keyword cannot be deleted. Its been assigned to one or more dataset");
 			
 			keywordDAO.deleteById(id);
 			return "{\n\t message: success \n}";
@@ -158,6 +248,9 @@ public class DictionaryController {
 			if(fundingSourcetDAO.findById(id).orElse(null) == null)
 				throw new SQLException("Funding source id does not exists");
 			
+			if(fundingGrantDAO.findByFundingSouce(id).size() > 0)
+				throw new SQLException("Funding source cannot be deleted. Its been assigned to one or more dataset");
+			
 			fundingSourcetDAO.deleteById(id);
 			return "{\n\t message: success \n}";
 		}
@@ -167,7 +260,19 @@ public class DictionaryController {
 			if(sampleDescriptorDAO.findSampleDescriptorById(id) == null)
 				throw new SQLException("Sample Descriptors id does not exists");
 			
+			if(sampleToSampleDescriptorDAO.findBySampleDescriptorId(id).size() > 0)
+				throw new SQLException("Sample Descriptor cannot be deleted. Its been assigned to one or more sample");
 			sampleDescriptorDAO.deleteById(id);
+			return "{\n\t message: success \n}";
+		}
+		else if(dict_name.equals("experiment_type")) {
+			if(experimentTypeDAO.findById(id).orElse(null) == null)
+				throw new SQLException("Experiment Type id does not exists");
+			
+			if(datasetToExperimentTypeDAO.findByExperimentType(id).size() > 0)
+				throw new SQLException("Experiment Type cannot be deleted. Its been assigned to one or more sample");
+		
+			experimentTypeDAO.deleteById(id);
 			return "{\n\t message: success \n}";
 		}
 			
