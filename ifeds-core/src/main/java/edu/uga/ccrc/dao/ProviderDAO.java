@@ -10,6 +10,8 @@ import edu.uga.ccrc.entity.Provider;
 public interface ProviderDAO extends CrudRepository<Provider, Integer> {
 		
 		Provider findByUsername(String username);
+		
+		Provider findByEmail(String email);
 
 }
 

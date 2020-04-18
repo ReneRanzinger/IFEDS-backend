@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,7 +57,13 @@ public class ProviderController {
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+    private JavaMailSender javaMailSender;
 
+	//update this in production
+	private String password_reset_link = "glygen.ccrc.uga.edu/ifeds/";
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	@ApiOperation(value = "Get Provider Info", response = ProviderBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
@@ -220,4 +229,78 @@ public class ProviderController {
 		return "{\n\t Success \n}";
 
 	}	
+	
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/reset_password/{input}", produces="application/json")
+	@ApiOperation(value = "Reset password. Generate token for resetting the password", response = String.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "SQL Exception"),
+			@ApiResponse(code = 403, message = "Bad URL Request"),
+			@ApiResponse(code = 404, message = "Requested URL not found") })
+	public String PasswordResetToken(@PathVariable String input) throws EntityNotFoundException, SQLException, NoResponeException {
+		
+		String username_or_email = input;
+		
+		Provider provider = providerDao.findByUsername(username_or_email);
+		
+		if(provider == null)
+			provider = providerDao.findByEmail(username_or_email);
+		
+		if(provider == null)
+			throw new SQLException("Invalid username or email");
+		
+		String token = generateToken();
+		
+		sendEmail(token, provider.getEmail(), provider.getName());
+		
+		provider.setPassword("RESET "+token);
+		
+		try {
+			providerDao.save(provider);
+		}catch(Exception e){
+			throw new NoResponeException("");
+		}
+		return "{\n\t message : success \n}";
+	}
+	
+	private String generateToken() 
+    { 
+		int n = 30; //size of reset_token
+  
+        // chose a Character random from this String 
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                    + "0123456789"
+                                    + "abcdefghijklmnopqrstuvxyz"; 
+  
+        // create StringBuffer size of AlphaNumericString 
+        StringBuilder sb = new StringBuilder(n); 
+  
+        for (int i = 0; i < n; i++) { 
+  
+            // generate a random number between 
+            // 0 to AlphaNumericString variable length 
+            int index 
+                = (int)(AlphaNumericString.length() 
+                        * Math.random()); 
+  
+            // add Character one by one in end of sb 
+            sb.append(AlphaNumericString 
+                          .charAt(index)); 
+        } 
+  
+        return sb.toString(); 
+    } 
+	
+	private void sendEmail(String token, String email, String name) {
+		
+		
+		SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(email);
+
+        msg.setSubject("IFEDs Password Reset Link");
+        msg.setText("Hello "+name+" \n Your password reset link is "+password_reset_link+"" + token);
+
+        javaMailSender.send(msg);
+	}
+  
 }
