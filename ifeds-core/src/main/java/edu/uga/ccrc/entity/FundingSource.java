@@ -26,8 +26,16 @@ public class FundingSource {
 	@Column(length=256)
 	private String url;
 	
-	protected FundingSource() {}
+	public FundingSource() {
+	}
 
+	public FundingSource(String name, String abbreviation, String url) {
+		this.name = name;
+		this.url = url;
+		this.abbreviation = abbreviation;
+	}
+
+	
 	public Long getFundingSourceId() {
 		return fundingSourceId;
 	}

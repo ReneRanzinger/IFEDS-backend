@@ -25,7 +25,13 @@ public class Keyword {
 	@Column(length=256)
 	private String url;
 	
-	protected Keyword() {}
+	public Keyword() {}
+	public Keyword(String name, String description, String url) {
+		
+		this.name = name;
+		this.description = description;
+		this.url = url;
+	}
 
 	public Long getKeywordId() {
 		return keywordId;

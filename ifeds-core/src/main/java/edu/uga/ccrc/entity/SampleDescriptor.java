@@ -37,7 +37,16 @@ public class SampleDescriptor {
 	@OneToMany(mappedBy = "sampleDescriptor")
     Set<SampleToSampleDescriptor> sampleToSampleDescriptors;
 	
-	protected SampleDescriptor() {}
+	public SampleDescriptor(String name, String description, String namespace, String url, String linkPattern) {
+		this.name = name;
+		this.description = description;
+		this.namespace = namespace;
+		this.url = url;
+		this.linkPattern = linkPattern;
+	}
+	
+	public SampleDescriptor() {
+	}
 
 	public Long getSampleDescriptorId() {
 		return sampleDescriptorId;

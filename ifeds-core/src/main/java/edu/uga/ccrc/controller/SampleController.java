@@ -128,8 +128,7 @@ public class SampleController {
 			@ApiResponse(code = 404, message = "The sample id resource is not found") })
 	public SampleWithDescriptorListBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response) throws EntityNotFoundException{
 		
-		
-		System.out.println("in samples/id");
+	
 		
 		//get sample
 		Sample sample = sampleDAO.findById(id).orElse(null);
