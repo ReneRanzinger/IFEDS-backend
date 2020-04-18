@@ -22,11 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.uga.ccrc.config.JwtTokenUtil;
 import edu.uga.ccrc.dao.DataFileDAO;
 import edu.uga.ccrc.dao.DatasetDAO;
+import edu.uga.ccrc.dao.PermissionsDAO;
 import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.dao.SampleDAO;
 import edu.uga.ccrc.entity.Dataset;
+import edu.uga.ccrc.entity.Permissions;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
+import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
@@ -62,7 +65,118 @@ public class ProviderController {
     private JavaMailSender javaMailSender;
 
 	//update this in production
-	private String password_reset_link = "glygen.ccrc.uga.edu/ifeds/";
+	private String password_reset_link = "glygen.ccrc.uga.edu/ifeds/password_reset/";
+	
+	@Autowired
+	PermissionsDAO permissionsDAO;
+	
+
+	
+	private boolean userIsAdmin(String username) {
+		
+		Provider provider = providerDao.findByUsername(username);
+		
+		Permissions p = permissionsDAO.findByProviderId(provider.getProviderId());
+		System.out.println("Provider id : "+p.getPermission_level());
+		if(p.getPermission_level().equals("admin"))
+			return true;
+		
+		return false;
+		
+	}
+	
+
+	@RequestMapping(method = RequestMethod.POST, value = "/create_user", produces="application/json")
+	@ApiOperation(value = "Create Provider(user)", response = ProviderBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
+			@ApiResponse(code = 404, message = "Username, Email and Name is required"),
+			@ApiResponse(code = 404, message = "{FiledName} characters greater than the allowed(64)"),
+			@ApiResponse(code = 404, message = "Username already in use"),
+			@ApiResponse(code = 404, message = "Email already in use"),
+			@ApiResponse(code = 403, message = "You don't have access to this web service"),
+			@ApiResponse(code = 500, message = "Internal Server Error")})
+	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResponeException {
+		
+final String requestTokenHeader = request.getHeader("Authorization");
+		
+		String jwtToken = requestTokenHeader.substring(7);
+		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+		
+		if(!userIsAdmin(username))
+			throw new ForbiddenException("You don't have access to this web service");
+		
+		Provider provider = new Provider();
+		
+		if(providerBean.getName() == null || providerBean.getName().length() < 4)
+			throw new SQLException("Name is required field with minimum 4 characters");
+		
+		if(providerBean.getUsername() == null || providerBean.getUsername().length() < 4)
+			throw new SQLException("Username is required field with minimum 4 characters");
+		
+		if(providerBean.getEmail() == null || providerBean.getEmail().length() < 5 )
+			throw new SQLException("Email is required field with minimum 5 characters");
+		
+		if(providerBean.getEmail().length() > 64)
+			throw new SQLException("Email characters greater than the allowed(64)");
+		
+
+		if(providerBean.getUsername().length() > 64)
+			throw new SQLException("Username characters greater than the allowed(64)");
+		
+		if(providerBean.getName().length() > 64)
+			throw new SQLException("Name characters greater than the allowed(64)");
+		
+		if(providerBean.getProviderGroup() != null && providerBean.getProviderGroup().length() > 64)
+			throw new SQLException("Provider Group characters greater than the allowed(64)");
+		
+		if(providerBean.getDepartment() != null && providerBean.getDepartment().length() > 64)
+			throw new SQLException("Provider Group characters greater than the allowed(64)");
+		
+
+		if(providerBean.getAffiliation() != null && providerBean.getAffiliation().length() > 64)
+			throw new SQLException("Affiliation characters greater than the allowed(64)");
+		
+		
+		if(providerBean.getUrl() != null && providerBean.getUrl().length() > 256)
+			throw new SQLException("URL characters greater than the allowed(257)");
+		
+		if(providerBean.getContact() != null && providerBean.getContact().length() > 32)
+			throw new SQLException("Contact characters greater than the allowed(257)");
+		
+		
+		
+		provider.setName(providerBean.getName());
+		provider.setDepartment(providerBean.getDepartment());
+		provider.setProviderGroup(providerBean.getProviderGroup());
+		provider.setAffiliation(providerBean.getAffiliation());
+		provider.setUrl(providerBean.getUrl());
+		provider.setContact(providerBean.getContact());
+		provider.setEmail(providerBean.getEmail());
+		provider.setUsername(providerBean.getUsername());
+		
+		if(providerDao.findByEmail(provider.getEmail()) != null)
+			throw new SQLException("Email already in use");
+		
+		if(providerDao.findByUsername(provider.getUsername()) != null)
+			throw new SQLException("Username already in use");
+		
+		String token = generateToken();
+		
+		String link = sendEmail(token, provider.getEmail(), provider.getName());
+		
+		provider.setPassword("RESET "+token);
+		
+		
+		try {
+			providerDao.save(provider);
+		}catch(Exception e){
+			throw new NoResponeException("Something went wrong");
+		}
+		return "{\n\t message : New user created \n\t set_password_link : " +link+"  \n}";
+		
+	}
+	
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	@ApiOperation(value = "Get Provider Info", response = ProviderBean.class)
@@ -291,7 +405,7 @@ public class ProviderController {
         return sb.toString(); 
     } 
 	
-	private void sendEmail(String token, String email, String name) {
+	private String sendEmail(String token, String email, String name) throws NoResponeException {
 		
 		
 		SimpleMailMessage msg = new SimpleMailMessage();
@@ -299,8 +413,17 @@ public class ProviderController {
 
         msg.setSubject("IFEDs Password Reset Link");
         msg.setText("Hello "+name+" \n Your password reset link is "+password_reset_link+"" + token);
-
-        javaMailSender.send(msg);
+        
+        try {
+        	javaMailSender.send(msg);	
+        	return password_reset_link+"" + token;
+        }catch(Exception e)
+        {
+        	throw new NoResponeException("");
+        }
+        
 	}
+	
+	
   
 }

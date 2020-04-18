@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import edu.uga.ccrc.view.bean.ProviderBean;
+
 @Entity
 @Table(name="provider",schema="core")
 public class Provider {
@@ -70,7 +72,8 @@ public class Provider {
 	
 	
 	
-	protected Provider() {}
+	public Provider() {}
+
 
 	public Long getProviderId() {
 		return providerId;
