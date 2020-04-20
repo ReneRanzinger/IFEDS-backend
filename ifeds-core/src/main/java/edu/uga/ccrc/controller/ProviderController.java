@@ -37,6 +37,7 @@ import edu.uga.ccrc.view.bean.ChangePasswordBean;
 import edu.uga.ccrc.view.bean.DashboardBean;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
+import edu.uga.ccrc.view.bean.ResetPasswordBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
@@ -375,6 +376,7 @@ final String requestTokenHeader = request.getHeader("Authorization");
 			throw new NoResponeException("");
 		}
 		return "{\n\t message : success \n}";
+		
 	}
 	
 	private String generateToken() 
@@ -424,6 +426,46 @@ final String requestTokenHeader = request.getHeader("Authorization");
         
 	}
 	
+	@RequestMapping(method = RequestMethod.POST, value = "/password_reset/{token}", produces="application/json")
+	@ApiOperation(value = "Reset Password", response = ResetPasswordBean.class)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "SQL Exception"),
+			@ApiResponse(code = 403, message = "Bad URL Request"),
+			@ApiResponse(code = 404, message = "Requested URL not found") })
+	public String ResetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResponeException{
+		final String requestTokenHeader = request.getHeader("Authorization");
+		String jwtToken = requestTokenHeader.substring(7);
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String user = resetPassword.getUsername();
+		String resetToken = token;
+		Provider provider = providerDao.findByUsername(user);
+		String password = provider.getPassword();
+		String[] pass = password.split(" ");
 	
+		if(pass[1].equals(resetToken)) {
+
+			try {
+				if(resetPassword.getNew_password().length() > 64) 
+					throw new SQLException("Name should be less than 64 character");
+				provider.setPassword(passwordEncoder.encode(resetPassword.getNew_password()));
+				
+				providerDao.save(provider);
+				return "{\n\t Success \n}";
+				
+		}
+			catch(Exception e ){
+				throw new  NoResponeException("");
+			
+		
+		}
+		
+		
+		
+		
+	}
+		return "error";
+		
+	
+	}
   
 }
