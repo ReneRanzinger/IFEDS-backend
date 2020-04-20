@@ -99,7 +99,7 @@ public class ProviderController {
 			@ApiResponse(code = 500, message = "Internal Server Error")})
 	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResponeException {
 		
-final String requestTokenHeader = request.getHeader("Authorization");
+		final String requestTokenHeader = request.getHeader("Authorization");
 		
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
@@ -452,7 +452,7 @@ final String requestTokenHeader = request.getHeader("Authorization");
 				providerDao.save(provider);
 				return "{\n\t Success \n}";
 				
-		}
+			}
 			catch(Exception e ){
 				throw new  NoResponeException("");
 			
