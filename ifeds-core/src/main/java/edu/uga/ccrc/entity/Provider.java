@@ -22,7 +22,7 @@ import edu.uga.ccrc.view.bean.ProviderBean;
 public class Provider {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="provider_id")
 	private Long providerId;
 	
