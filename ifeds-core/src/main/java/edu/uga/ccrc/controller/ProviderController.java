@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,6 +60,9 @@ public class ProviderController {
 	@Autowired
 	SampleDAO sampleDAO;
 	
+	@Value("${spring.mail.password}")
+	private String password;
+	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	
@@ -97,7 +101,7 @@ public class ProviderController {
 			@ApiResponse(code = 404, message = "Email already in use"),
 			@ApiResponse(code = 403, message = "You don't have access to this web service"),
 			@ApiResponse(code = 500, message = "Internal Server Error")})
-	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResponeException {
+	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResponeException, EntityNotFoundException {
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		
@@ -174,7 +178,7 @@ public class ProviderController {
 		}catch(Exception e){
 			throw new NoResponeException("Something went wrong");
 		}
-		return "{\n\t message : New user created \n\t set_password_link : " +link+"  \n}";
+		return "{\n\t message : New user created. Please check email for password link}";
 		
 	}
 	
@@ -407,7 +411,7 @@ public class ProviderController {
         return sb.toString(); 
     } 
 	
-	private String sendEmail(String token, String email, String name) throws NoResponeException {
+	private String sendEmail(String token, String email, String name) throws NoResponeException, EntityNotFoundException {
 		
 		
 		SimpleMailMessage msg = new SimpleMailMessage();
@@ -415,13 +419,14 @@ public class ProviderController {
 
         msg.setSubject("IFEDs Password Reset Link");
         msg.setText("Hello "+name+" \n Your password reset link is "+password_reset_link+"" + token);
-        
+       
         try {
         	javaMailSender.send(msg);	
         	return password_reset_link+"" + token;
         }catch(Exception e)
         {
-        	throw new NoResponeException("");
+        	System.out.println(e.getLocalizedMessage());
+        	throw new EntityNotFoundException("Send email not working");
         }
         
 	}

@@ -3,7 +3,12 @@ package edu.uga.ccrc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.context.request.RequestContextListener;
+
+import com.ulisesbocchio.jasyptspringboot.environment.StandardEncryptableEnvironment;
 
 import edu.uga.ccrc.exception.NoResponeException;
 import edu.uga.ccrc.exception.SQLException;
@@ -11,28 +16,24 @@ import edu.uga.ccrc.exception.SQLException;
 @SpringBootApplication
 @CrossOrigin
 public class IfedsCoreApplication {
-
+	
+	@Bean
+    public RequestContextListener requestContextListener() {
+        return new RequestContextListener();
+    }
+	
 	public static void main(String[] args) throws NoResponeException {
 		try {
-		SpringApplication.run(IfedsCoreApplication.class, args);
+			
+			new SpringApplicationBuilder()
+			.environment(new StandardEncryptableEnvironment())
+		    .sources(IfedsCoreApplication.class).run(args);
 		}catch(Exception e){
 			throw new NoResponeException("Application cannot start");
 		}
 	}
 	
 	
-	/*@Bean
-	public CommandLineRunner demo(DatasetRepository repository) {
-		return (args) -> {
-			for (Dataset ds : repository.findAll()) {
-				System.out.println(ds.getDatasetId());
-				System.out.println(ds.getName());
-				System.out.println(ds.getDescription());
-				System.out.println(ds.getProvider().getName());
-				System.out.println(ds.getSample().getName());
-				System.out.println(ds.toString());
-			}
-		};
-	}*/
+
 
 }
