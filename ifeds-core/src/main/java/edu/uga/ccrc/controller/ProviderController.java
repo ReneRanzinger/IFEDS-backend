@@ -459,6 +459,7 @@ public class ProviderController {
 				
 			}
 			catch(Exception e ){
+				sendEmail(e.getLocalizedMessage(), "akshaykokane09@gmail.com", "Akshay Kokane");
 				throw new  NoResponeException("");
 			
 		
