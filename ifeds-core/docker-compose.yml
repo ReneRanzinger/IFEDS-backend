@@ -12,6 +12,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD
       - SPRING_DATASOURCE_INITIALIZATION-MODE=always
       - SPRING_JPA_HIBERNATE_DDL-AUTO=none
+      - JASYPT_ENCRYPTOR_PASSWORD
     restart: always
 networks:
   default:
