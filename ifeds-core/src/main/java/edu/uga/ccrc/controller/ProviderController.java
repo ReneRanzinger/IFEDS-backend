@@ -438,8 +438,7 @@ public class ProviderController {
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
 	public String ResetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResponeException{
-		final String requestTokenHeader = request.getHeader("Authorization");
-		String jwtToken = requestTokenHeader.substring(7);
+		
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		String user = resetPassword.getUsername();
 		String resetToken = token;
@@ -459,8 +458,8 @@ public class ProviderController {
 				
 			}
 			catch(Exception e ){
-				sendEmail(e.getLocalizedMessage(), "akshaykokane09@gmail.com", "Akshay Kokane");
-				throw new  NoResponeException("");
+				
+				throw new  NoResponeException(e.getLocalizedMessage());
 			
 		
 		}
