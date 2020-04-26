@@ -60,8 +60,6 @@ public class ProviderController {
 	@Autowired
 	SampleDAO sampleDAO;
 	
-	@Value("${spring.mail.password}")
-	private String password;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
