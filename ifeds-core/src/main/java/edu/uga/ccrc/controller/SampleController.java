@@ -287,7 +287,6 @@ public class SampleController {
 			
 			
 			if(sampleDescriptor == null) {
-				sampleDAO.deleteById(saved.getSampleId());
 				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
 			}
 			
