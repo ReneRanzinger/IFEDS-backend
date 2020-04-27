@@ -1,6 +1,7 @@
 package edu.uga.ccrc.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +68,7 @@ public class PermissionsController {
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-		
+		HashSet<Long> providerIdsWithPermissions = new HashSet<Long>();
 		
 		if(!userIsAdmin(username)) 
 			throw new ForbiddenException("You don't have access to this web service");
@@ -75,14 +76,29 @@ public class PermissionsController {
 		List<PermissionsBean> result = new ArrayList();
 		
 		for(Permissions permission : permissionsDAO.findAll()) {
-			if(username.contentEquals(permission.getProvider().getUsername()))
+			if(username.contentEquals(permission.getProvider().getUsername())) {
+				providerIdsWithPermissions.add(permission.getPermissions_id());
 				continue;
+			}
+				
 			PermissionsBean pb = new PermissionsBean();
-			System.out.println(permission.toString());
+			
 			pb.setEmail(permission.getProvider().getEmail());
 			pb.setUsername(permission.getProvider().getUsername());
 			pb.setPermission_level(permission.getPermission_level());
 			pb.setProvider_id(permission.getProvider().getProviderId());
+			providerIdsWithPermissions.add(pb.getProvider_id());
+			result.add(pb);
+		}
+		
+		for(Provider provider : providerDao.findAll()) {
+			if(providerIdsWithPermissions.contains(provider.getProviderId()))
+				continue;
+			PermissionsBean pb = new PermissionsBean();
+			pb.setEmail(provider.getEmail());
+			pb.setUsername(provider.getUsername());
+			pb.setPermission_level("default");
+			pb.setProvider_id(provider.getProviderId());
 			result.add(pb);
 		}
 		return result;
