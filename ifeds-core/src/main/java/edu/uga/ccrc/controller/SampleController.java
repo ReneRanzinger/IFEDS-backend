@@ -179,11 +179,14 @@ public class SampleController {
 		newSample.setUrl(sampleHelperBean.getUrl());
 		newSample.setDescription(sampleHelperBean.getDescription());
 		Sample saved = null;
+		
 		try {
 		 saved = sampleDAO.save(newSample);
 		}catch(Exception e) {
-			
-			 throw new SQLException("Cannot save the sample. :  "+e.getLocalizedMessage());
+			if(sampleDAO.findByName(newSample.getName()) != null)
+			 throw new SQLException("Sample with same name already exists");
+			else
+				throw new SQLException("Failed to save sample");
 		}
 
 		savedSampleId = saved.getSampleId();			
@@ -204,6 +207,7 @@ public class SampleController {
 			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
 			
 			if(sampleDescriptor == null) {
+				sampleDAO.deleteById(saved.getSampleId());
 				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
 			}
 			
@@ -283,6 +287,7 @@ public class SampleController {
 			
 			
 			if(sampleDescriptor == null) {
+				sampleDAO.deleteById(saved.getSampleId());
 				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
 			}
 			
