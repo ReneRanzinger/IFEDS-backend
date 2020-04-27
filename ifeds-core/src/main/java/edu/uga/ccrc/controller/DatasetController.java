@@ -399,7 +399,7 @@ public class DatasetController {
 		
 		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
 		
-		if(datasetDAO.findByName(createDatasetHelperBean.getDatasetName()) != null)
+		if(!datasetDAO.findByDatasetName(createDatasetHelperBean.getDatasetName()).isEmpty())
 			throw new SQLException("Duplicate Name. Dataset with same name already exists!");
 		
 		try {
@@ -408,7 +408,7 @@ public class DatasetController {
 			throw new NoResponeException("Something went Wrong could not save the dataset");
 		}
 		
-		
+		List<String> error = new ArrayList<>();
 		//2)Save dataset-to-funding-grant 
 		
 		for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
@@ -499,6 +499,7 @@ public class DatasetController {
 			//get Paper
 			Paper paper = paperDAO.findById(paperId).orElse(null);
 			if(paper == null) {
+
 				datasetDAO.deleteById(dataset.getDatasetId());
 				throw new EntityNotFoundException("Paper doesn't exists : " + paperId);
 			}
