@@ -10,7 +10,7 @@ import org.springframework.web.context.request.RequestContextListener;
 
 import com.ulisesbocchio.jasyptspringboot.environment.StandardEncryptableEnvironment;
 
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.exception.SQLException;
 
 @SpringBootApplication
@@ -22,14 +22,14 @@ public class IfedsCoreApplication {
         return new RequestContextListener();
     }
 	
-	public static void main(String[] args) throws NoResponeException {
+	public static void main(String[] args) throws NoResposneException {
 		try {
 			
 			new SpringApplicationBuilder()
 			.environment(new StandardEncryptableEnvironment())
 		    .sources(IfedsCoreApplication.class).run(args);
 		}catch(Exception e){
-			throw new NoResponeException("Application cannot start");
+			throw new NoResposneException("Application cannot start");
 		}
 	}
 	

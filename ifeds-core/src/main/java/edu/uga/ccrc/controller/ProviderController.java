@@ -31,7 +31,7 @@ import edu.uga.ccrc.entity.Permissions;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
 import edu.uga.ccrc.view.bean.ChangePasswordBean;
@@ -60,6 +60,8 @@ public class ProviderController {
 	@Autowired
 	SampleDAO sampleDAO;
 	
+	@Value("${jasypt.encryptor.password}")
+	private String password;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -99,7 +101,7 @@ public class ProviderController {
 			@ApiResponse(code = 404, message = "Email already in use"),
 			@ApiResponse(code = 403, message = "You don't have access to this web service"),
 			@ApiResponse(code = 500, message = "Internal Server Error")})
-	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResponeException, EntityNotFoundException {
+	public String createUser(HttpServletRequest request, @RequestBody ProviderBean providerBean) throws ForbiddenException, SQLException, NoResposneException, EntityNotFoundException {
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		
@@ -147,8 +149,6 @@ public class ProviderController {
 		if(providerBean.getContact() != null && providerBean.getContact().length() > 32)
 			throw new SQLException("Contact characters greater than the allowed(257)");
 		
-		
-		
 		provider.setName(providerBean.getName());
 		provider.setDepartment(providerBean.getDepartment());
 		provider.setProviderGroup(providerBean.getProviderGroup());
@@ -174,7 +174,7 @@ public class ProviderController {
 		try {
 			providerDao.save(provider);
 		}catch(Exception e){
-			throw new NoResponeException("Something went wrong");
+			throw new NoResposneException("Something went wrong");
 		}
 		return "{\n\t message : New user created. Please check email for password link}";
 		
@@ -212,7 +212,7 @@ public class ProviderController {
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
 			@ApiResponse(code = 404, message = "The Provider Info is not found") })
-	public String updateProviderInformation(HttpServletRequest request, HttpServletResponse response, @RequestBody ProviderBean providerBean) throws EntityNotFoundException, SQLException, NoResponeException {
+	public String updateProviderInformation(HttpServletRequest request, HttpServletResponse response, @RequestBody ProviderBean providerBean) throws EntityNotFoundException, SQLException, NoResposneException {
 		
 		System.out.println("Updating provider information ");
 		final String requestTokenHeader = request.getHeader("Authorization");
@@ -251,7 +251,7 @@ public class ProviderController {
 		try {
 		providerDao.save(provider);}
 		catch(Exception e) {
-			throw new NoResponeException("Something went wrong");
+			throw new NoResposneException("Something went wrong");
 		}
 		return "{\n\t message : Successfully updated Provider's information \n}";
 		
@@ -323,7 +323,7 @@ public class ProviderController {
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
-	public String Change_Password(HttpServletRequest request, HttpServletResponse response, @RequestBody ChangePasswordBean changePassword) throws EntityNotFoundException, SQLException, NoResponeException {
+	public String Change_Password(HttpServletRequest request, HttpServletResponse response, @RequestBody ChangePasswordBean changePassword) throws EntityNotFoundException, SQLException, NoResposneException {
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
@@ -354,7 +354,7 @@ public class ProviderController {
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
-	public String PasswordResetToken(@PathVariable String input) throws EntityNotFoundException, SQLException, NoResponeException {
+	public String PasswordResetToken(@PathVariable String input) throws EntityNotFoundException, SQLException, NoResposneException {
 		
 		String username_or_email = input;
 		
@@ -375,7 +375,7 @@ public class ProviderController {
 		try {
 			providerDao.save(provider);
 		}catch(Exception e){
-			throw new NoResponeException("");
+			throw new NoResposneException("");
 		}
 		return "{\n\t message : success \n}";
 		
@@ -409,7 +409,7 @@ public class ProviderController {
         return sb.toString(); 
     } 
 	
-	private String sendEmail(String token, String email, String name) throws NoResponeException, EntityNotFoundException {
+	private String sendEmail(String token, String email, String name) throws NoResposneException, EntityNotFoundException {
 		
 		
 		SimpleMailMessage msg = new SimpleMailMessage();
@@ -435,9 +435,10 @@ public class ProviderController {
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
-	public String ResetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResponeException{
-		
+	public String ResetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResposneException{
+		System.out.println(password);
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		
 		String user = resetPassword.getUsername();
 		String resetToken = token;
 		Provider provider = providerDao.findByUsername(user);
@@ -449,23 +450,18 @@ public class ProviderController {
 			try {
 				if(resetPassword.getNew_password().length() > 64) 
 					throw new SQLException("Name should be less than 64 character");
+				
 				provider.setPassword(passwordEncoder.encode(resetPassword.getNew_password()));
+				System.out.println(passwordEncoder);
 				
 				providerDao.save(provider);
 				return "{\n\t Success \n}";
-				
 			}
 			catch(Exception e ){
-				
-				throw new  NoResponeException(e.getLocalizedMessage());
-			
+				throw new  NoResposneException(e.getLocalizedMessage());
+			}
 		
 		}
-		
-		
-		
-		
-	}
 		return "error";
 		
 	

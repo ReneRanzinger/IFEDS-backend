@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.uga.ccrc.dao.SampleTypeDAO;
 import edu.uga.ccrc.dao.SettingsDAO;
 import edu.uga.ccrc.entity.Settings;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.view.bean.SampleTypeBean;
 import edu.uga.ccrc.view.bean.SettingsBean;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +33,7 @@ public class SettingController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Already initialised"),
 			@ApiResponse(code = 404, message = "Error") })
-	public String init(@PathVariable String key, @PathVariable String value) throws NoResponeException{
+	public String init(@PathVariable String key, @PathVariable String value) throws NoResposneException{
 		
 		System.out.println("In init web service");
 	
@@ -50,7 +50,7 @@ public class SettingController {
 		try {
 			settingsDAO.save(setting);
 		}catch(Exception e) {
-			throw new NoResponeException("Cannot save the setting");
+			throw new NoResposneException("Cannot save the setting");
 		}
 		
 		
@@ -71,7 +71,7 @@ public class SettingController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "List of settings in key-value pair"),
 			@ApiResponse(code = 404, message = "Error") })
-	public List<SettingsBean> get_settings() throws NoResponeException{
+	public List<SettingsBean> get_settings() throws NoResposneException{
 		
 		List<SettingsBean> resultBean = new ArrayList<>();
 		System.out.println("Get settings");

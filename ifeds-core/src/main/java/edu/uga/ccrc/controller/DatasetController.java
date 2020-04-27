@@ -71,7 +71,7 @@ import edu.uga.ccrc.view.bean.CreateSampleHelperBean;
 
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DataFileBean;
 import edu.uga.ccrc.view.bean.DataFileInfoBean;
@@ -367,7 +367,7 @@ public class DatasetController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not created") })
-	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResponeException {
+	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResposneException {
 		
 		
 		System.out.println("In create dataset : ");
@@ -405,7 +405,7 @@ public class DatasetController {
 		try {
 			dataset = datasetDAO.save(dataset);
 		}catch(Exception e) {
-			throw new NoResponeException("Something went Wrong could not save the dataset");
+			throw new NoResposneException("Something went Wrong could not save the dataset");
 		}
 		
 		List<String> error = new ArrayList<>();
@@ -784,7 +784,7 @@ public class DatasetController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
-	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResponeException, SQLException, EntityNotFoundException {
+	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResposneException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
 		
 		//get dataFile
@@ -826,7 +826,7 @@ public class DatasetController {
 			return "Success";
 		}
 		catch(Exception e) {
-			throw new NoResponeException("Something went wrong. Please try after sometime");
+			throw new NoResposneException("Something went wrong. Please try after sometime");
 		}
 		
 	}
@@ -856,7 +856,7 @@ public class DatasetController {
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
 	@ApiOperation(value = "Delete a file")
-	public String deleteUploadedFile(@PathVariable Long id) throws NoResponeException, EntityNotFoundException {
+	public String deleteUploadedFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException {
 		System.out.println("In delete file");
 		
 			if(!dataFileDAO.existsById(id))
@@ -866,7 +866,7 @@ public class DatasetController {
 			try {
 			dataFileDAO.deleteById(id);
 			}catch(Exception e){
-				throw new NoResponeException("Something went wrong. Please try after sometime");
+				throw new NoResposneException("Something went wrong. Please try after sometime");
 			}
 			
 			return "Deleted";

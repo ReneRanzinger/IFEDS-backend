@@ -21,7 +21,7 @@ import edu.uga.ccrc.entity.Permissions;
 import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.view.bean.PermissionsBean;
 import edu.uga.ccrc.view.bean.ProviderBean;
 import io.swagger.annotations.ApiOperation;
@@ -96,7 +96,7 @@ public class PermissionsController {
 			@ApiResponse(code = 403, message = "If update causes no admin user in permissions table"),
 			@ApiResponse(code = 404, message = "Wrong action mentioned. Allowed actions are (promote, demote, enable, disable)")
 			 })
-	public String updatePermissions(HttpServletRequest request, HttpServletResponse response, @PathVariable("action") String action, @PathVariable("id") Long provider_id) throws ForbiddenException, EntityNotFoundException, NoResponeException {
+	public String updatePermissions(HttpServletRequest request, HttpServletResponse response, @PathVariable("action") String action, @PathVariable("id") Long provider_id) throws ForbiddenException, EntityNotFoundException, NoResposneException {
 		
 		System.out.println("Updating provider permission_level : updatePermissions() ");
 		//System.out.println("Action:" + action);
@@ -113,7 +113,7 @@ public class PermissionsController {
 		Permissions permission = permissionsDAO.findByProviderId(provider_id);
 		
 		//incase of demote, make sure that there is atleast one admin the permission table
-		if(permission.getPermission_level().equals("admin") && action.equals("demote")) {
+		if(permission.getPermission_level()!= null && permission.getPermission_level().equals("admin") && action.equals("demote")) {
 			
 			if(permissionsDAO.getAdminOtherThanThisId(provider_id) != null)
 				permission.setPermission_level("default");
@@ -146,7 +146,7 @@ public class PermissionsController {
 			permissionsDAO.save(permission);
 			return "{\n\t message: User permission successfuly updated \n}";
 		}catch(Exception e){
-			throw new NoResponeException("Error occured while updating to database");
+			throw new NoResposneException("Error occured while updating to database");
 		}
 		
 			

@@ -185,6 +185,7 @@ public class SampleController {
 			
 			 throw new SQLException("Cannot save the sample. :  "+e.getLocalizedMessage());
 		}
+
 		savedSampleId = saved.getSampleId();			
 		
 		//create entry in sampleToSampleDescriptors

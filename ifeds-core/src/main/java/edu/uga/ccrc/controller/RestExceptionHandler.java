@@ -15,7 +15,7 @@ import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ErrorDetails;
 import edu.uga.ccrc.exception.ExpiredJwtException;
 import edu.uga.ccrc.exception.ForbiddenException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.exception.SQLException;
 
 @CrossOrigin
@@ -59,7 +59,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(NoResponeException.class)
+	@ExceptionHandler(NoResposneException.class)
 	protected ResponseEntity<Object> handleNoResponseException(WebRequest request) {
 		ErrorDetails error = new ErrorDetails();
 		error.setTimestamp(new Date());

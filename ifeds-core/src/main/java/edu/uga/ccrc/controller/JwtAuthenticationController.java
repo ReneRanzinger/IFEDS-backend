@@ -63,8 +63,10 @@ public class JwtAuthenticationController {
 				.loadUserByUsername(authenticationRequest.getUsername());
 		final String token = jwtTokenUtil.generateToken(userDetails);
 			Provider provider = providerDao.findByUsername(authenticationRequest.getUsername());
+			String permission_level = "default";
 			
-			String permission_level = permissionsDAO.findByProviderId(provider.getProviderId()).getPermission_level();
+			if(permissionsDAO.findByProviderId(provider.getProviderId()).getPermission_level() != null)
+				permission_level = permissionsDAO.findByProviderId(provider.getProviderId()).getPermission_level();
 			
 			return ResponseEntity.ok(new JwtResponseBean(token, permission_level));
 	}

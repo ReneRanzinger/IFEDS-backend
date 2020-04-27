@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import edu.uga.ccrc.dao.ProviderDAO;
 import edu.uga.ccrc.entity.Provider;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.view.bean.ProviderBean;
 
 @Service

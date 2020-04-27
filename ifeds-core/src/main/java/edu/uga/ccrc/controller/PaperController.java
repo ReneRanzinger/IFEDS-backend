@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.uga.ccrc.dao.PaperDAO;
 import edu.uga.ccrc.entity.Paper;
 import edu.uga.ccrc.exception.EntityNotFoundException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.view.bean.PaperBean;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -59,7 +59,7 @@ public class PaperController {
 	@CrossOrigin
 	@GetMapping(value = "/paper_mata_data/{pmid}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public PaperBean getPaperMetaData(HttpServletRequest request, @PathVariable long pmid) throws IOException, JSONException, EntityNotFoundException, NoResponeException  {
+	public PaperBean getPaperMetaData(HttpServletRequest request, @PathVariable long pmid) throws IOException, JSONException, EntityNotFoundException, NoResposneException  {
 		
 		if(paperDAO.existsById(pmid))
 		{
@@ -110,7 +110,7 @@ public class PaperController {
  * 
  * */
 	@CrossOrigin
-	private void savePaperToDB(PaperBean paperBean, long pmid) throws NoResponeException {
+	private void savePaperToDB(PaperBean paperBean, long pmid) throws NoResposneException {
 
 		if(paperDAO.findById(pmid) != null || paperDAO.findByPMId(pmid) != null) {
 		
@@ -119,7 +119,7 @@ public class PaperController {
 				paperDAO.save(paper);
 			}catch (Exception e){
 				System.out.println(e.getLocalizedMessage());
-				throw new NoResponeException("Cannot save the paper");
+				throw new NoResposneException("Cannot save the paper");
 			}
 		}
 		

@@ -32,7 +32,7 @@ import edu.uga.ccrc.entity.Provider;
 import edu.uga.ccrc.entity.SampleDescriptor;
 import edu.uga.ccrc.exception.EntityNotFoundException;
 import edu.uga.ccrc.exception.ForbiddenException;
-import edu.uga.ccrc.exception.NoResponeException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.exception.SQLException;
 import edu.uga.ccrc.view.bean.DatasetBean;
 import edu.uga.ccrc.view.bean.DictionaryBean;
@@ -97,7 +97,7 @@ public class DictionaryController {
 	@CrossOrigin
 	@GetMapping(value = "/getDictionary/{dict_name}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public Object getDictionart(HttpServletRequest request, @PathVariable String dict_name ) throws NoResponeException, EntityNotFoundException, ForbiddenException{
+	public Object getDictionart(HttpServletRequest request, @PathVariable String dict_name ) throws NoResposneException, EntityNotFoundException, ForbiddenException{
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
@@ -134,7 +134,7 @@ public class DictionaryController {
 	@CrossOrigin
 	@PostMapping(value = "/dictionary/{dict_name}", produces = "application/json")
 	// http://localhost:8080/datasets
-	public String setDictionary(HttpServletRequest request, @PathVariable String dict_name,@RequestBody DictionaryBean dictionary ) throws NoResponeException, EntityNotFoundException, SQLException, ForbiddenException{
+	public String setDictionary(HttpServletRequest request, @PathVariable String dict_name,@RequestBody DictionaryBean dictionary ) throws NoResposneException, EntityNotFoundException, SQLException, ForbiddenException{
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
