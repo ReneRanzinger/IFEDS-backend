@@ -182,20 +182,7 @@ public class ProviderController {
 	}
 	
 
-	@RequestMapping(method = RequestMethod.POST, value = "/makeActive/{username}", produces="application/json")
-	public String makeActive(@PathVariable String username) {
-		Provider provider = providerDao.findByUsername(username);
-		provider.setActive(true);
-		providerDao.save(provider);
-		return "true";
-		
-	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/getProviderInfo/{username}", produces="application/json")
-	public Provider getInfo(@PathVariable String username) {
-		Provider provider = providerDao.findByUsername(username);
-		return provider;
-	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	@ApiOperation(value = "Get Provider Info", response = ProviderBean.class)
