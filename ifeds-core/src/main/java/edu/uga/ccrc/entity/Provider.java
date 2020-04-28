@@ -61,7 +61,7 @@ public class Provider {
 	
 
 	@Column(name="active")
-	private boolean active;
+	private boolean active = true;
 
 
 	@OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)

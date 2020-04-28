@@ -157,6 +157,7 @@ public class ProviderController {
 		provider.setContact(providerBean.getContact());
 		provider.setEmail(providerBean.getEmail());
 		provider.setUsername(providerBean.getUsername());
+		provider.setActive(true);
 		
 		if(providerDao.findByEmail(provider.getEmail()) != null)
 			throw new SQLException("Email already in use");
@@ -180,6 +181,21 @@ public class ProviderController {
 		
 	}
 	
+
+	@RequestMapping(method = RequestMethod.POST, value = "/makeActive/{username}", produces="application/json")
+	public String makeActive(@PathVariable String username) {
+		Provider provider = providerDao.findByUsername(username);
+		provider.setActive(true);
+		providerDao.save(provider);
+		return "true";
+		
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/getProviderInfo/{username}", produces="application/json")
+	public Provider getInfo(@PathVariable String username) {
+		Provider provider = providerDao.findByUsername(username);
+		return provider;
+	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/getProvider", produces="application/json")
 	@ApiOperation(value = "Get Provider Info", response = ProviderBean.class)
@@ -435,7 +451,7 @@ public class ProviderController {
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
-	public String ResetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResposneException{
+	public String resetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResposneException, ForbiddenException{
 		System.out.println(password);
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		
@@ -447,22 +463,24 @@ public class ProviderController {
 	
 		if(pass[1].equals(resetToken)) {
 
+			
+			if(resetPassword.getNew_password().length() > 64) 
+				throw new SQLException("Name should be less than 64 character");
+				
+			provider.setPassword(passwordEncoder.encode(resetPassword.getNew_password()));
+			
 			try {
-				if(resetPassword.getNew_password().length() > 64) 
-					throw new SQLException("Name should be less than 64 character");
-				
-				provider.setPassword(passwordEncoder.encode(resetPassword.getNew_password()));
-				System.out.println(passwordEncoder);
-				
 				providerDao.save(provider);
-				return "{\n\t Success \n}";
+				return "{\n\t message : success \n}";
 			}
 			catch(Exception e ){
-				throw new  NoResposneException(e.getLocalizedMessage());
+				throw new  ForbiddenException("Failed to save new password. Please try after sometime");
 			}
 		
 		}
-		return "error";
+		
+		throw new ForbiddenException("Token does not match");
+		
 		
 	
 	}
