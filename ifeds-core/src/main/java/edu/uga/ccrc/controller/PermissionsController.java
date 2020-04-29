@@ -128,8 +128,11 @@ public class PermissionsController {
 		
 		Permissions permission = permissionsDAO.findByProviderId(provider_id);
 		
-		if(permission == null)
+		if(permission == null) {
 			 permission = new Permissions();
+			 permission.setProvider(provider);
+		}
+			
 		
 		//incase of demote, make sure that there is atleast one admin the permission table
 		if(permission.getPermission_level()!= null && permission.getPermission_level().equals("admin") && action.equals("demote")) {
