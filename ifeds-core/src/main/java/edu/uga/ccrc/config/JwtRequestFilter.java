@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import edu.uga.ccrc.exception.ForbiddenException;
+import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
 
 @Component
@@ -28,7 +30,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+			throws ServletException, IOException, UsernameNotFoundException {
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String username = null;
 		String jwtToken = null;
@@ -52,8 +54,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		// if username valid then validate the token.
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = null;
-			userDetails = this.jwtUserDetailsService.loadUserByUsername(username);	
+			try {
+				userDetails = this.jwtUserDetailsService.loadUserByUsername(username);	
+			}catch(Exception e){
 			
+				System.out.println("token didn't match");
+				return;
+			}
 			// if token is valid configure Spring Security to manually set authentication
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

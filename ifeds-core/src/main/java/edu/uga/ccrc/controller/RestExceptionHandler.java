@@ -60,11 +60,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(NoResposneException.class)
-	protected ResponseEntity<Object> handleNoResponseException(WebRequest request) {
+	protected ResponseEntity<Object> handleNoResponseException(Exception e, WebRequest request) {
 		ErrorDetails error = new ErrorDetails();
 		error.setTimestamp(new Date());
 		error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-		error.setMessage("Something went wrong. Please try after sometime");	
+		error.setMessage(e.getMessage());	
 		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

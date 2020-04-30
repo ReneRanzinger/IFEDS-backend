@@ -368,35 +368,25 @@ public class DatasetController {
 			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not created") })
 	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResposneException {
-		
-		
-		System.out.println("In create dataset : ");
+//		System.out.println("In create dataset : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
-
 		//1)Save dataset
-		
 		Dataset dataset = new Dataset();
-	
 		dataset.setName(createDatasetHelperBean.getDatasetName());
-		
 		dataset.setSample(sampleDAO.findById(createDatasetHelperBean.getSampleIds()).orElse(null));
-		
+
 		if(dataset.getSample() == null)
 			throw new EntityNotFoundException("Sample id doesn't exists");
 		
-		
 		//token starts after 7th position as token is appnended with 'Bearer' 
 		String jwtToken = requestTokenHeader.substring(7);
-		
 		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-
 		//get provider data by username
 		Provider provider = providerDAO.findByUsername(username); 	
+		
 		dataset.setProvider(provider);
-		
 		dataset.setDescription(createDatasetHelperBean.getDescription());
-		
 		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
 		
 		if(!datasetDAO.findByDatasetName(createDatasetHelperBean.getDatasetName()).isEmpty())
@@ -405,44 +395,31 @@ public class DatasetController {
 		try {
 			dataset = datasetDAO.save(dataset);
 		}catch(Exception e) {
-			throw new NoResposneException("Something went Wrong could not save the dataset");
+			throw new NoResposneException("Something went Wrong could not save the dataset "+ e.getLocalizedMessage());
 		}
 		
-		List<String> error = new ArrayList<>();
 		//2)Save dataset-to-funding-grant 
-		
 		for(CreateFundingGrantHelperBean fundGrant :createDatasetHelperBean.getFunding_grant()) {
-			
 			//create composite PK
 			FundingGrantPK fundingGrantPK = new FundingGrantPK(dataset.getDatasetId(), fundGrant.getFunding_source_id(), fundGrant.getGrant_number());
-			
 			//create m-n object
 			FundingGrant fundingGrant = new FundingGrant();
-			
 			//find funding source
 			FundingSource fundingSource = fundingSourcetDAO.findById(fundGrant.getFunding_source_id()).orElse(null);
 			
 			if(fundingSource == null) {
 				datasetDAO.deleteById(dataset.getDatasetId());
 				throw new EntityNotFoundException("Funding source doesn't exists");
-				
 			}
 			
 			fundingGrant.setDataset(dataset);
 			fundingGrant.setFundingGrantPK(fundingGrantPK);
 			fundingGrant.setFundingSource(fundingSource);
 			fundingGrant.setUrl(fundGrant.getUrl());
-			
 			fundingGrant = fundingGrantDAO.save(fundingGrant);
-			
 		}
-		
-		
-		
 		//3)Save dataset-to-experimentType
-		
 		for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
-			
 			//get experiment type
 			ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
 			
@@ -454,7 +431,6 @@ public class DatasetController {
 			
 			//build composite PK
 			DatasetToExperimentTypePK datasetToExperimentTypePK = new DatasetToExperimentTypePK(dataset.getDatasetId(), experimentType.getExperimentTypeId());
-			
 			//create object for m-n entry
 			DatasetToExperimentType datasetToExperimentType = new DatasetToExperimentType();
 			
@@ -463,59 +439,45 @@ public class DatasetController {
 			datasetToExperimentType.setExperimentType(experimentType);
 			datasetToExperimentType.setDescription(expTypeIdAndDes.getDescription());
 			datasetToExperimentType = datasetToExperimentTypeDAO.save(datasetToExperimentType);
-			
 		}
 		
 		//build composite pk
-		
 		//4)Save dataset-to-keyWords
 		for(Long keyWordId :createDatasetHelperBean.getKeywordsIds()) {
-			
 			//get keyword
 			Keyword keyword = keywordDAO.findById(keyWordId).orElse(null);
 			if(keyword == null) {
 				datasetDAO.deleteById(dataset.getDatasetId());
 				throw new EntityNotFoundException("Keyword doesn't exists : " + keyWordId);
 			}
-			
 			//build compositePk
 			DatasetToKeywordPK datasetToKeywordPK = new DatasetToKeywordPK(dataset.getDatasetId(), keyword.getKeywordId());
-			
 			//create object for m-n entry
 			DatasetToKeyword datasetToKeyword = new DatasetToKeyword();
 			
 			datasetToKeyword.setDataset(dataset);
 			datasetToKeyword.setDatasetToKeywordPK(datasetToKeywordPK);
 			datasetToKeyword.setKeyword(keyword);
-			
 			datasetToKeyword = datasetToKeywordDAO.save(datasetToKeyword);
-			
 		}
 		
 		
 		//5)Save dataset-to-paper
 		for(Long paperId : createDatasetHelperBean.getPaperIds()) {
-			
 			//get Paper
 			Paper paper = paperDAO.findById(paperId).orElse(null);
 			if(paper == null) {
-
 				datasetDAO.deleteById(dataset.getDatasetId());
 				throw new EntityNotFoundException("Paper doesn't exists : " + paperId);
 			}
-			
 			//build composite PK
 			DatasetToPaperPK datasetToPaperPK = new DatasetToPaperPK(dataset.getDatasetId(), paper.getPaperId());
-			
 			//create object for m-n entry
 			DatasetToPaper datasetToPaper = new DatasetToPaper();
-			
 			datasetToPaper.setDataset(dataset);
 			datasetToPaper.setDatasetToPaperPK(datasetToPaperPK);
 			datasetToPaper.setPaper(paper);
-			
 			datasetToPaper = datasetToPaperDAO.save(datasetToPaper);
-			
 		}
 		
 		return "{\n\tCreated new Dataset with id : " + dataset.getDatasetId() + "}";

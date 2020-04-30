@@ -34,31 +34,19 @@ public class SettingController {
 			@ApiResponse(code = 403, message = "Already initialised"),
 			@ApiResponse(code = 404, message = "Error") })
 	public String init(@PathVariable String key, @PathVariable String value) throws NoResposneException{
-		
-		System.out.println("In init web service");
-	
+//		System.out.println("In init web service");
 		//1. Check if key already exists. If exists, then flush it
-		
 		if(settingsDAO.existsByKey(key) != null) {
 			settingsDAO.deleteByKey(key);
 		}
-		
 		//2. If key doesn't exists. Then add the new entry in db
-		
 		Settings setting = new Settings(key, value);
-		
 		try {
 			settingsDAO.save(setting);
 		}catch(Exception e) {
 			throw new NoResposneException("Cannot save the setting");
 		}
-		
-		
 		return "Success"; 
-		
-		
-		
-		
 	}
 	/*
 	 * get list of settings
@@ -72,24 +60,14 @@ public class SettingController {
 			@ApiResponse(code = 403, message = "List of settings in key-value pair"),
 			@ApiResponse(code = 404, message = "Error") })
 	public List<SettingsBean> get_settings() throws NoResposneException{
-		
 		List<SettingsBean> resultBean = new ArrayList<>();
-		System.out.println("Get settings");
-		
+//		System.out.println("Get settings");
 		for(Settings setting : settingsDAO.findAll()) {
 			SettingsBean settingBean = new SettingsBean();
 			settingBean.setKey(setting.getKey());
 			settingBean.setValue(setting.getValue());
 			resultBean.add(settingBean);
 		}
-		
 		return resultBean;
-		
-		
-		
 	}
-	
-	
-	
-	
 }

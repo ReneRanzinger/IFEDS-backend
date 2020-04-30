@@ -71,52 +71,31 @@ public class SampleController {
 	 * */
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/getSample", produces="application/json")
-	@ApiOperation(value = "Get Sample", response = SampleBean.class)
+	@ApiOperation(value = "Get Sample: Reurns provider's owned samples", response = SampleBean.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Accessing the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample resource is not found") })
-	public List<SampleBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
-		
+	public List<SampleWithDescriptorListBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
 		System.out.println("Retrieving provider's uploaded dataset information : getSamples() ");
 		final String requestTokenHeader = request.getHeader("Authorization");
-		
 		//token starts after 7th position as token is appnended with 'Bearer' 
 		String jwtToken = requestTokenHeader.substring(7);
-		
 		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-
 		//get provider data by username
 		Provider provider = providerDao.findByUsername(username);
-		
-		//
-		
-		String providerName = provider.getName();
-		
 		//search in the dataset, the dataset owned by current provider
-		List<SampleBean> result = new ArrayList<SampleBean>();
+		List<SampleWithDescriptorListBean> result = new ArrayList<SampleWithDescriptorListBean>();
 		
 		for (Sample sample : sampleDAO.findSampleByProviderId(provider.getProviderId())) {
-		
-			SampleBean sampleBean = new SampleBean();
-			
-			sampleBean.setSampleId(sample.getSampleId());
-			sampleBean.setSampleTypeId(sample.getSampleType().getSampleTypeId());
-			sampleBean.setSampleTypeName(sample.getSampleType().getName());
-			sampleBean.setUrl(sample.getUrl());
-			sampleBean.setName(sample.getName());
-			sampleBean.setDescription(sample.getDescription());
+			SampleWithDescriptorListBean sampleBean = new SampleWithDescriptorListBean(sample);
 			result.add(sampleBean);
-			
 		}
-		
 		return result;
-	
-		
 	}
 	
 	/*
-	 * this method returns the list of the sample descriptor
+	 * this method returns the sample information
 	 * 
 	 * */
 	
@@ -127,19 +106,13 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Accessing the sample id is forbidden"),
 			@ApiResponse(code = 404, message = "The sample id resource is not found") })
 	public SampleWithDescriptorListBean getSample(HttpServletRequest request, @PathVariable Long id, HttpServletResponse response) throws EntityNotFoundException{
-		
-	
-		
 		//get sample
 		Sample sample = sampleDAO.findById(id).orElse(null);
 		if(sample == null) throw new EntityNotFoundException("Sample id invalid	"); //no sample found
-		
-		
 		//prepare the bean
 		SampleWithDescriptorListBean sb = new SampleWithDescriptorListBean(sample);
-
-		return sb;
 		
+		return sb;
 	}
 	
 	/*
@@ -156,23 +129,17 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Creating the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample is not created") })
 	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException, EntityNotFoundException{
-	
-		System.out.println("In Create Sample : ");
-		Long savedSampleId = null;
-		
+		//System.out.println("In Create Sample : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
-		
 		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 		Provider owner = providerDao.findByUsername(username);
-		
 		//get sampleType from id
 		SampleType sampleType = sampleTypeDAO.findSampleTypeById(sampleHelperBean.getSample_type_id());
 		
 		//create sample	
 		Sample newSample = new Sample();
-		
 		newSample.setProvider(owner);
 		newSample.setName(sampleHelperBean.getName());
 		newSample.setSampleType(sampleType);
@@ -184,25 +151,20 @@ public class SampleController {
 		 saved = sampleDAO.save(newSample);
 		}catch(Exception e) {
 			if(sampleDAO.findByName(newSample.getName()) != null)
-			 throw new SQLException("Sample with same name already exists");
+			 throw new SQLException("Sample with same name already exists "+e.getLocalizedMessage());
 			else
-				throw new SQLException("Failed to save sample");
+				throw new SQLException("Failed to save sample"+e.getLocalizedMessage());
 		}
 
-		savedSampleId = saved.getSampleId();			
-		
 		//create entry in sampleToSampleDescriptors
 		//sample descriptors are stored by Ids in the List of Longs
 		//need to save same descriptors one by one from the list
 		
 		for(CreateSampleToSampleDescriptorHelperBean descriptor : sampleHelperBean.getSample_descriptors()) {
-			
 			//1) Create composite Primary key
 			SampleToSampleDescriptorPK sampleToSampleDescPK = new SampleToSampleDescriptorPK(newSample.getSampleId(),descriptor.getSample_descriptor_id(),descriptor.getSample_descriptor_value());
-			
 			//2) Create SampleToSampleDescriptor object
 			SampleToSampleDescriptor sampleToSampleDescriptor = new SampleToSampleDescriptor();
-			
 			//3) Get Sample Descriptor
 			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
 			
@@ -210,22 +172,16 @@ public class SampleController {
 				sampleDAO.deleteById(saved.getSampleId());
 				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
 			}
-			
 			//4) Set all entries
 			sampleToSampleDescriptor.setSampleToSampleDescPK(sampleToSampleDescPK);	
 			sampleToSampleDescriptor.setSample(saved);
 			sampleToSampleDescriptor.setSampleDescriptor(sampleDescriptor);
 			sampleToSampleDescriptor.setUnitOfMeasurement(descriptor.getUnit_of_measurment());
-			
 			//5) Save
 			SampleToSampleDescriptor savedEntry = sampleToSampleDescriptorDAO.save(sampleToSampleDescriptor);
-			
-
 		}
 	
 		return "{\n\tmessage: new sample created succssfully \n\t" + "id :" + saved.getSampleId() + "}";
-	
-		
 	}
 	/*
 	 * this method update the  sample. All information from user is mapped to helper bean
@@ -241,24 +197,17 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Updating the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample is not updated") })
 	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws EntityNotFoundException {
-		
-		System.out.println("In update Sample : ");
-		
-	
+//		System.out.println("In update Sample : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
-		
 		//get username from token
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 		Provider owner = providerDao.findByUsername(username);
-		
 		//get sampleType from id
 		SampleType sampleType = sampleTypeDAO.findSampleTypeById(sampleHelperBean.getSample_type_id());
 		Sample sample;
 		
-		
 		//create sample	
-		
 		sample = sampleDAO.findById(id).orElse(null);
 		if(sample == null)
 			throw new EntityNotFoundException("Sample with id : "+ id +" not present");
@@ -275,35 +224,25 @@ public class SampleController {
 		sampleToSampleDescriptorDAO.deleteSampleToSampleDescriptorBySampleId(id);
 		
 		for(CreateSampleToSampleDescriptorHelperBean descriptor : sampleHelperBean.getSample_descriptors()) {
-			
 			//1) Create composite Primary key
 			SampleToSampleDescriptorPK sampleToSampleDescPK = new SampleToSampleDescriptorPK(saved.getSampleId(),descriptor.getSample_descriptor_id(),descriptor.getSample_descriptor_value());
-			
 			//2) Create SampleToSampleDescriptor object
 			SampleToSampleDescriptor sampleToSampleDescriptor = new SampleToSampleDescriptor();
-			
 			//3) Get Sample Descriptor
 			SampleDescriptor sampleDescriptor = sampleDescriptorDAO.findSampleDescriptorById(descriptor.getSample_descriptor_id());	
-			
 			
 			if(sampleDescriptor == null) {
 				throw new EntityNotFoundException("Sample Descriptor not present " + descriptor.getSample_descriptor_id());
 			}
-			
 			//4) Set all entries
 			sampleToSampleDescriptor.setSampleToSampleDescPK(sampleToSampleDescPK);	
 			sampleToSampleDescriptor.setSample(saved);
 			sampleToSampleDescriptor.setSampleDescriptor(sampleDescriptor);
 			sampleToSampleDescriptor.setUnitOfMeasurement(descriptor.getUnit_of_measurment());
-			
 			//5) Save
 			SampleToSampleDescriptor savedEntry = sampleToSampleDescriptorDAO.save(sampleToSampleDescriptor);
-			
-
 		}
 		return "message : Sample Updated : " + id;
-
-			
 	}
 	
 		
@@ -321,8 +260,7 @@ public class SampleController {
 		List<String> res = new ArrayList<>();
 		if(sampleDAO.findById(id).orElse(null) == null)
 			throw new EntityNotFoundException("Id not present : " + id);
-		
-		System.out.println("Deleting Sample : deleteSample() id : " + id);
+		//System.out.println("Deleting Sample : deleteSample() id : " + id);
 		sampleDAO.deleteById(id);
 		res.add("Sample with id " + id +" deleted successfully");	
 			
