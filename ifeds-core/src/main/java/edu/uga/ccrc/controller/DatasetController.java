@@ -661,8 +661,6 @@ public class DatasetController {
 			@RequestParam("resumableChunkSize") long resumableChunkSize,
             @RequestParam("resumableChunkNumber") int resumableChunkNumber,
             @RequestParam("resumableTotalChunks") int resumableTotalChunks)throws IOException, InterruptedException, SQLException {
-		
-		
 		//save the file in the temporary file
 		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
 		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
@@ -676,8 +674,6 @@ public class DatasetController {
 		
 		 //if its a last chunk, then save the file in db and rename the file name
 		 if (resumableTotalChunks == resumableChunkNumber) {
-			 	
-			    
 	            System.out.println("File uploaded successfuly");
 	            long file_size = FileChannel.open(tempFile).size();
 	            
@@ -712,27 +708,16 @@ public class DatasetController {
 	 */
 	
 	private long saveUploadedFile(String filePath, String orginalFileName, long file_size) throws SQLException {
-		
 		DataFile dataFile = new DataFile();
-	
-
 		//in this case it is always 1. 1 === in_progress. As at this point of time we don't have meta information of the file
 		long dataset_type_id = 1;
-		
 		DataType dataType = dataTypeDAO.findById(dataset_type_id).orElse(null); //in progress
-		
 		dataFile.setOrigFileName(orginalFileName);//save original file name	
-		
 		dataFile.setSize(file_size);//set file_size
-		
 		dataFile.setDataType(dataType); //in_progress
-		
 		dataFile = dataFileDAO.save(dataFile); //save
-		
-	
 		//return id
 		return dataFile.getDataFileId();
-		
 	}
 	/*
 	 * This method is called when file has been uploaded to the server. This is the method, to provide the meta 
@@ -748,13 +733,10 @@ public class DatasetController {
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResposneException, SQLException, EntityNotFoundException {
 		System.out.println("Inside save file");
-		
 		//get dataFile
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
-		
 		//get dataset
 		Dataset dataSet = datasetDAO.findById(dataFileInfo.getDataset_id()).orElse(null);
-		
 		//get dataType
 		DataType dataType = dataTypeDAO.findById(dataFileInfo.getData_type_id()).orElse(null);
 		//System.out.println(dataFileInfo.getData_type_id());

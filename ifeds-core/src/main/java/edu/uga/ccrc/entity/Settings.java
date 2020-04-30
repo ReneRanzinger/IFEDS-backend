@@ -22,7 +22,7 @@ public class Settings {
 	protected Settings() {}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="settings_id", nullable=false)
 	private Long sr_no;
 	

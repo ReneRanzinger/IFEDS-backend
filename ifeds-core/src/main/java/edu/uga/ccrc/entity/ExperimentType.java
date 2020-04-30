@@ -12,7 +12,7 @@ import javax.persistence.Table;
 public class ExperimentType {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="experiment_type_id", nullable=false)
 	private Long experimentTypeId;
 	

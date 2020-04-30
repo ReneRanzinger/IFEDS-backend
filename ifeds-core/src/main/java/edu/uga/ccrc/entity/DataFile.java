@@ -16,7 +16,7 @@ import javax.persistence.UniqueConstraint;
 public class DataFile {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="data_file_id", nullable=false)
 	private Long dataFileId;
 	

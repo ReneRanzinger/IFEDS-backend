@@ -19,7 +19,7 @@ import javax.persistence.Table;
 public class SampleType {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="sample_type_id")
 	private Long sampleTypeId;
 	

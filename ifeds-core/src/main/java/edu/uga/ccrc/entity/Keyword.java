@@ -12,7 +12,7 @@ import javax.persistence.Table;
 public class Keyword {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="keyword_id", nullable=false)
 	private Long keywordId;
 	

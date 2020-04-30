@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class SampleDescriptor {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="sample_descriptor_id", nullable=false)
 	private Long sampleDescriptorId;
 	

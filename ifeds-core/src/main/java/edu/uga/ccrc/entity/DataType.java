@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class DataType {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="data_type_id", nullable=false)
 	private Long dataTypeId;
 	
