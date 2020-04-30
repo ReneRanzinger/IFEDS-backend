@@ -12,7 +12,7 @@ import javax.persistence.Table;
 public class FundingSource {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="funding_source_id", nullable=false)
 	private Long fundingSourceId;
 	

@@ -17,7 +17,7 @@ import javax.persistence.Table;
 public class Dataset {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="dataset_id", nullable=false)
 	private Long datasetId;
 	
