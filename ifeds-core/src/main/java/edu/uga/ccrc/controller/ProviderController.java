@@ -351,16 +351,13 @@ public class ProviderController {
 	}	
 	
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/reset_password/{input}", produces="application/json")
+	@RequestMapping(method = RequestMethod.GET, value = "/reset_password/{username_or_email}", produces="application/json")
 	@ApiOperation(value = "Reset password. Generate token for resetting the password", response = String.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 400, message = "SQL Exception"),
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
-	public String PasswordResetToken(@PathVariable String input) throws EntityNotFoundException, SQLException, NoResposneException {
-		
-		String username_or_email = input;
-		
+	public String PasswordResetToken(@PathVariable String username_or_email) throws EntityNotFoundException, SQLException, NoResposneException {
 		Provider provider = providerDao.findByUsername(username_or_email);
 		
 		if(provider == null)
@@ -370,15 +367,13 @@ public class ProviderController {
 			throw new SQLException("Invalid username or email");
 		
 		String token = generateToken();
-		
 		sendEmail(token, provider.getEmail(), provider.getName());
-		
 		provider.setPassword("RESET "+token);
 		
 		try {
 			providerDao.save(provider);
 		}catch(Exception e){
-			throw new NoResposneException("");
+			throw new NoResposneException("Cannot reset the password. Please try after sometime");
 		}
 		return "{\n\t message : success \n}";
 		
