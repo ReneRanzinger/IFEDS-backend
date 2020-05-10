@@ -139,7 +139,7 @@ public class PermissionsController {
 			if(permissionsDAO.getAdminOtherThanThisId(provider_id) != null)
 				permissionsDAO.deleteByPermissionId(permission.getPermissions_id());
 			else
-				throw new ForbiddenException("Atleast one user should exist with admin permission level");
+				throw new ForbiddenException("Atleast one user should exist with admin permission level.");
 		}
 		//check if promote, then make the provider admin
 		else if(action.equals("promote")) {
