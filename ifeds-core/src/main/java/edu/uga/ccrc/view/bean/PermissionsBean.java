@@ -9,6 +9,7 @@ public class PermissionsBean {
 	private String email;
 	private Long provider_id;
 	private String permission_level;
+	private boolean active;
 	public String getUsername() {
 		return username;
 	}
@@ -32,6 +33,12 @@ public class PermissionsBean {
 	}
 	public void setPermission_level(String permission_level) {
 		this.permission_level = permission_level;
+	}
+	public boolean isActive() {
+		return active;
+	}
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 

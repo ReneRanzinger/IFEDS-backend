@@ -421,7 +421,6 @@ public class ProviderController {
         	return password_reset_link+"" + token;
         }catch(Exception e)
         {
-        	System.out.println(e.getLocalizedMessage());
         	throw new EntityNotFoundException("Send email not working");
         }
         
