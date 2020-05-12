@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class Permissions {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="permissions_id")
 	private Long permissions_id;
 	
