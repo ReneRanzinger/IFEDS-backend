@@ -88,9 +88,10 @@ public class SampleController {
 		List<SampleWithDescriptorListBean> result = new ArrayList<SampleWithDescriptorListBean>();
 		
 		for (Sample sample : sampleDAO.findSampleByProviderId(provider.getProviderId())) {
-			SampleWithDescriptorListBean sampleBean = new SampleWithDescriptorListBean(sample);
+			SampleWithDescriptorListBean sampleBean = new SampleWithDescriptorListBean(sample);	
 			result.add(sampleBean);
 		}
+		System.out.println(result.size());
 		return result;
 	}
 	
