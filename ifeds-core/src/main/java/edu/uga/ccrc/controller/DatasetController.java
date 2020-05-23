@@ -367,12 +367,16 @@ public class DatasetController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"),
 			@ApiResponse(code = 403, message = "Creating the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not created") })
-	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResposneException {
+	public String createDataset(HttpServletRequest request, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException, SQLException, NoResposneException, ForbiddenException {
 //		System.out.println("In create dataset : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		//1)Save dataset
 		Dataset dataset = new Dataset();
+		
 		dataset.setName(createDatasetHelperBean.getDatasetName());
+		if(dataset.getName().length() > 256)
+			throw new ForbiddenException("Dataset name should be less than 256 characters!");
+		
 		dataset.setSample(sampleDAO.findById(createDatasetHelperBean.getSampleIds()).orElse(null));
 
 		if(dataset.getSample() == null)
@@ -387,6 +391,10 @@ public class DatasetController {
 		
 		dataset.setProvider(provider);
 		dataset.setDescription(createDatasetHelperBean.getDescription());
+		
+		if(dataset.getDescription().length() > 1000)
+			throw new ForbiddenException("Description should be less than 1000 characters!");
+		
 		dataset.setIsPublic(createDatasetHelperBean.isIs_public());
 		
 		if(!datasetDAO.findByDatasetName(createDatasetHelperBean.getDatasetName()).isEmpty())
@@ -395,7 +403,7 @@ public class DatasetController {
 		try {
 			dataset = datasetDAO.save(dataset);
 		}catch(Exception e) {
-			throw new NoResposneException("Something went Wrong could not save the dataset "+ e.getLocalizedMessage());
+			throw new NoResposneException("Something went Wrong could not save the dataset ");
 		}
 		
 		//2)Save dataset-to-funding-grant 
@@ -438,6 +446,8 @@ public class DatasetController {
 			datasetToExperimentType.setDatasetToExperimentTypePK(datasetToExperimentTypePK);
 			datasetToExperimentType.setExperimentType(experimentType);
 			datasetToExperimentType.setDescription(expTypeIdAndDes.getDescription());
+			if(datasetToExperimentType.getDescription().length() > 1000)
+				throw new ForbiddenException("Experiment Type description should be less than 1000 characters!");
 			datasetToExperimentType = datasetToExperimentTypeDAO.save(datasetToExperimentType);
 		}
 		
@@ -843,6 +853,25 @@ public class DatasetController {
         } 
           
 	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/dataFiles/{id}", produces="application/json")
+	@ApiOperation(value = "Sends byte array of the uploaded file. Client need to convert the file to required type")
+	public byte[] downloadFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException {
+		System.out.println("In delete file");
+		
+			if(!dataFileDAO.existsById(id))
+				throw new EntityNotFoundException("File id doesn't exist");
+
+			try {
+				Path path = Paths.get("datasetFile/test.txt");
+			    byte[] data = Files.readAllBytes(path);
+				return data;
+			}catch(Exception e){
+				throw new NoResposneException("Something went wrong. Please try after sometime");
+			}
+			
+	}
+	
 	
 	
 }

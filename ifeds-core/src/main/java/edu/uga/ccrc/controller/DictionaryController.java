@@ -122,8 +122,6 @@ public class DictionaryController {
 			return experimentTypeDAO.findAll();
 		
 		
-		
-		
 		throw new EntityNotFoundException("Wrong dictionary name");
 		
 	}
