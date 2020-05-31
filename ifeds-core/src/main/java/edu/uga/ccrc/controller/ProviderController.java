@@ -211,7 +211,12 @@ public class ProviderController {
 		
 		ProviderBean providerBean = new ProviderBean();
 		providerBean.setName(provider.getName());
+		providerBean.setContact(provider.getContact());
+		providerBean.setAffiliation(provider.getAffiliation());
+		providerBean.setProviderGroup(provider.getProviderGroup());
+		providerBean.setDepartment(provider.getDepartment());
 		providerBean.setEmail(provider.getEmail());
+		providerBean.setUrl(provider.getUrl());
 		providerBean.setUsername(provider.getUsername());
 		providerBean.setProviderId(provider.getProviderId());
 	
@@ -239,6 +244,7 @@ public class ProviderController {
 		
 		Provider provider = providerDao.findByUsername(username); 
 		
+		
 		if(providerBean.getName().length() > 64)
 			throw new SQLException("Name should be less than 64 character");
 		provider.setName(providerBean.getName());
@@ -264,7 +270,7 @@ public class ProviderController {
 		provider.setProviderGroup(providerBean.getProviderGroup());
 
 		try {
-			providerDao.save(provider);
+			provider = providerDao.save(provider);
 			return "{\n\t message : Successfully updated Provider's information \n}";
 		}
 		catch(Exception e) {
