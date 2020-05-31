@@ -55,19 +55,24 @@ public class PaperController {
 			@ApiResponse(code = 404, message = "Paper with given pubmed id not found/valid")}
 	)
 	
+	@GetMapping(value = "/DEBUG/deleteAllPaper", produces = "application/json")
+	public String DEBUG() {
+		
+		paperDAO.deleteAll();
+		return "Success";
+		
+	}
 	
 	@CrossOrigin
 	@GetMapping(value = "/paper_mata_data/{pmid}", produces = "application/json")
 	// http://localhost:8080/datasets
 	public PaperBean getPaperMetaData(HttpServletRequest request, @PathVariable long pmid) throws IOException, JSONException, EntityNotFoundException, NoResposneException  {
 		
-		if(paperDAO.existsById(pmid))
+		if(paperDAO.findByPMId(pmid) != null)
 		{
-			System.out.println("Paper already in db. Returning the meta-info");
-			Paper paper = paperDAO.findById(pmid).orElse(null);
-			
+			//System.out.println("Paper already in db. Returning the meta-info");
+			Paper paper = paperDAO.findByPMId(pmid);
 			PaperBean paperBean = new PaperBean(paper.getTitle(),paper.getAuthorList(),paper.getJournalName(),pmid, paper.getUrl());
-			
 			return paperBean;
 		}
 		

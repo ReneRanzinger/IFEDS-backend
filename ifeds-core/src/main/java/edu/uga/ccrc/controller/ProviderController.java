@@ -1,7 +1,10 @@
 package edu.uga.ccrc.controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -69,8 +72,17 @@ public class ProviderController {
 	@Autowired
     private JavaMailSender javaMailSender;
 
-	//update this in production
-	private String password_reset_link = "glygen.ccrc.uga.edu/ifeds/password_reset/";
+	
+	@Value("${password_rest.link}")
+	private  String password_reset_link;
+	
+	@Value("${password_rest.token_size}")
+	private  int length_of_password_reset_token;
+	
+	@Value("${password_reset.email.template_path}")
+	private  String passwordResetEmailTemplate;
+	
+	
 	
 	@Autowired
 	PermissionsDAO permissionsDAO;
@@ -252,11 +264,13 @@ public class ProviderController {
 		provider.setProviderGroup(providerBean.getProviderGroup());
 
 		try {
-		providerDao.save(provider);}
+			providerDao.save(provider);
+			return "{\n\t message : Successfully updated Provider's information \n}";
+		}
 		catch(Exception e) {
 			throw new NoResposneException("Something went wrong");
 		}
-		return "{\n\t message : Successfully updated Provider's information \n}";
+		
 		
 		
 	}
@@ -381,17 +395,15 @@ public class ProviderController {
 	
 	private String generateToken() 
     { 
-		int n = 30; //size of reset_token
-  
         // chose a Character random from this String 
         String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                     + "0123456789"
                                     + "abcdefghijklmnopqrstuvxyz"; 
   
         // create StringBuffer size of AlphaNumericString 
-        StringBuilder sb = new StringBuilder(n); 
+        StringBuilder sb = new StringBuilder(length_of_password_reset_token); 
   
-        for (int i = 0; i < n; i++) { 
+        for (int i = 0; i < length_of_password_reset_token; i++) { 
   
             // generate a random number between 
             // 0 to AlphaNumericString variable length 
@@ -414,7 +426,7 @@ public class ProviderController {
         msg.setTo(email);
 
         msg.setSubject("IFEDs Password Reset Link");
-        msg.setText("Hello "+name+" \n Your password reset link is "+password_reset_link+"" + token);
+        msg.setText(generateEmailBody(name, password_reset_link+"" + token));
        
         try {
         	javaMailSender.send(msg);	
@@ -424,6 +436,40 @@ public class ProviderController {
         	throw new EntityNotFoundException("Send email not working");
         }
         
+	}
+	
+	private String generateEmailBody(String name, String link) throws NoResposneException {
+		try {
+		
+		      File template = new File(passwordResetEmailTemplate);
+		      Scanner myReader = new Scanner(template);
+		      StringBuilder emailBody = new StringBuilder();
+		      while (myReader.hasNextLine()) {
+		        String line = myReader.nextLine();
+		        if(line.contains("[")) {
+		        	int startIndex = line.indexOf('[');
+		        	int endIndex = line.lastIndexOf(']');
+		        	
+		        	switch(line.substring(startIndex, endIndex + 1)) {
+		        		case "[username]" : 
+		        			line = line.substring(0, startIndex) + name+""+line.substring(endIndex + 1); 
+		        			break;
+		        		case "[link]":
+		        			line = line.substring(0, startIndex) +link+ line.substring(endIndex + 1); 
+		        			break;
+		        	}
+		        }
+		        emailBody.append(line+"\n");
+		        
+		      }
+		      myReader.close();
+		      return emailBody.toString();
+		    } catch (FileNotFoundException e) {
+		      throw new NoResposneException("Email Template Not Found");
+		    
+		    }catch (Exception e) {
+		    	 throw new NoResposneException("Something went wrong while sending email!");
+		    }
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/password_reset/{token}", produces="application/json")

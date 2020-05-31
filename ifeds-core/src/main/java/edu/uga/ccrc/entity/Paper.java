@@ -14,6 +14,7 @@ import edu.uga.ccrc.view.bean.PaperBean;
 public class Paper {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="paper_id", nullable=false)
 	private Long paperId;
 	
@@ -34,8 +35,7 @@ public class Paper {
 	
 	public Paper() {}
 	public Paper(PaperBean paperBean) {
-		
-		this.paperId = paperBean.getPmid();
+
 		this.title = paperBean.getTitle();
 		this.authorList = paperBean.getAuthorList();
 		this.journalName = paperBean.getJournalName();
