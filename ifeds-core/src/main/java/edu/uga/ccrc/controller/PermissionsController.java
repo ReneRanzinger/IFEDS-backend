@@ -1,6 +1,8 @@
 package edu.uga.ccrc.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -96,7 +98,16 @@ public class PermissionsController {
 			pb.setPermission_level("default");
 			result.add(pb);
 		}
-		
+		Collections.sort(result, new Comparator<PermissionsBean>() {
+
+			@Override
+			public int compare(PermissionsBean o1, PermissionsBean o2) {
+				// TODO Auto-generated method stub
+				return o1.getUsername().compareTo(o2.getUsername());
+			}
+			
+			
+		});
 		return result;
 	}
 	
@@ -166,7 +177,7 @@ public class PermissionsController {
 		try {
 			if(action.equals("promote")) //if promote action, then update permissions table
 				permissionsDAO.save(permission);
-			else	//else update provider table
+			else	//else update provider table (enable, disable)
 				providerDao.save(provider); 
 			return "{\n\t message: User permission successfuly updated \n}";
 		}catch(Exception e){
