@@ -216,8 +216,6 @@ public class ProviderController {
 		providerBean.setProviderGroup(provider.getProviderGroup());
 		providerBean.setDepartment(provider.getDepartment());
 		providerBean.setEmail(provider.getEmail());
-		providerBean.setUrl(provider.getUrl());
-		providerBean.setUsername(provider.getUsername());
 		providerBean.setProviderId(provider.getProviderId());
 	
 		
