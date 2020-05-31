@@ -1,0 +1,9 @@
+Hi [username],
+
+Need to reset your password to get into your IFED’s account? Click on the link below to reset your password.
+
+[link]
+
+
+Thanks You,
+IFEDS Team
