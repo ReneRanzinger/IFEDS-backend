@@ -53,7 +53,7 @@ public class PaperController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success"), 
 			@ApiResponse(code = 500, message = "Internal server error"),
 			@ApiResponse(code = 404, message = "Paper with given pubmed id not found/valid")}
-	)	
+	)
 	@CrossOrigin
 	@GetMapping(value = "/paper_mata_data/{pmid}", produces = "application/json")
 	// http://localhost:8080/datasets
