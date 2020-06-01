@@ -1,9 +1,9 @@
-Hi [username],
+Hello [username],
 
-Need to reset your password to get into your IFED’s account? Click on the link below to reset your password.
-
+An new account has been created for you in the IFEDS data repository. Please use this link to create a new password for your account:
 [link]
 
+In case of problems please contact Rene Ranzinger (rene@ccrc.uga.edu).
 
 Thanks You,
 IFEDS Team
