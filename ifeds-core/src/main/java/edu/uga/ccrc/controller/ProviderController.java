@@ -469,7 +469,8 @@ public class ProviderController {
 		      myReader.close();
 		      return emailBody.toString();
 		    } catch (FileNotFoundException e) {
-		      throw new NoResposneException("Email Template Not Found");
+		    	return "Hello "+name+" \n Your password reset link is "+link;
+		      //throw new NoResposneException("Email Template Not Found");
 		    
 		    }catch (Exception e) {
 		    	 throw new NoResposneException("Something went wrong while sending email!");
