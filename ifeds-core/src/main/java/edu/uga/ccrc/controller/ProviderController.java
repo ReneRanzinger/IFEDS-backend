@@ -2,6 +2,8 @@ package edu.uga.ccrc.controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -12,10 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +63,9 @@ public class ProviderController {
 	DatasetDAO datasetDAO;
 	
 	@Autowired
+	ResourceLoader resourceLoader;
+	
+	@Autowired
 	DataFileDAO dataFileDAO;
 	
 	@Autowired
@@ -78,10 +86,6 @@ public class ProviderController {
 	
 	@Value("${password_rest.token_size}")
 	private  int length_of_password_reset_token;
-	
-	@Value("${password_reset.email.template_path}")
-	private  String passwordResetEmailTemplate;
-	
 	
 	
 	@Autowired
@@ -422,7 +426,6 @@ public class ProviderController {
   
         return sb.toString(); 
     } 
-	
 	private String sendEmail(String token, String email, String name) throws NoResposneException, EntityNotFoundException {
 		
 		
@@ -444,10 +447,13 @@ public class ProviderController {
 	
 	private String generateEmailBody(String name, String link) throws NoResposneException {
 		try {
-		
-		      File template = new File(passwordResetEmailTemplate);
-		      Scanner myReader = new Scanner(template);
-		      StringBuilder emailBody = new StringBuilder();
+			
+			Resource resource = resourceLoader.getResource("classpath:EmailTemplate.txt");
+		    InputStream inputStream = resource.getInputStream();
+		    byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+	        String data = new String(bdata, StandardCharsets.UTF_8);
+		    Scanner myReader = new Scanner(data);
+		    StringBuilder emailBody = new StringBuilder();
 		      while (myReader.hasNextLine()) {
 		        String line = myReader.nextLine();
 		        if(line.contains("[")) {
