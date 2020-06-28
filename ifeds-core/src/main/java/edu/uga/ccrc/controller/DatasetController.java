@@ -2,6 +2,7 @@
 package edu.uga.ccrc.controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryNotEmptyException;
@@ -856,7 +857,7 @@ public class DatasetController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/dataFiles/{id}", produces="application/json")
 	@ApiOperation(value = "Sends byte array of the uploaded file. Client need to convert the file to required type")
-	public byte[] downloadFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException {
+	public byte[] downloadFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException, IOException {
 		System.out.println("In delete file");
 		
 			if(!dataFileDAO.existsById(id))
@@ -866,8 +867,10 @@ public class DatasetController {
 				Path path = Paths.get("datasetFile/test.txt");
 			    byte[] data = Files.readAllBytes(path);
 				return data;
+			}catch(FileNotFoundException e){
+				throw new NoResposneException("Something went wrong with File Download"+e.getMessage());
 			}catch(Exception e){
-				throw new NoResposneException("Something went wrong. Please try after sometime");
+				throw new NoResposneException("Something went wrong. Please try after sometime"+e.getMessage());
 			}
 			
 	}

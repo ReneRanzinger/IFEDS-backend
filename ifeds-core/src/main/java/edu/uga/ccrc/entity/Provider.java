@@ -52,16 +52,16 @@ public class Provider {
 	
 	@Column(length=32, nullable=false, unique=true)
 	private String email;
-	
-	@Column(name="auth_token", length=128)
-	private String authToken;
-	
+		
 	@Column(name="auth_time_out")
 	private Integer authTimeOut;
 	
 
 	@Column(name="active")
 	private boolean active = true;
+
+	@Column(name="auth_token")
+	private String reset_token;
 
 
 	@OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
@@ -155,13 +155,6 @@ public class Provider {
 		this.email = email;
 	}
 
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
 
 	public Integer getAuthTimeOut() {
 		return authTimeOut;
@@ -194,5 +187,15 @@ public class Provider {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+
+	public String getReset_token() {
+		return reset_token;
+	}
+
+
+	public void setReset_token(String reset_token) {
+		this.reset_token = reset_token;
 	}
 }

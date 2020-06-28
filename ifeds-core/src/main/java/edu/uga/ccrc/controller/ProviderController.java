@@ -87,6 +87,12 @@ public class ProviderController {
 	@Value("${password_rest.token_size}")
 	private  int length_of_password_reset_token;
 	
+	@Value("${new_user.email.template_path}")
+	private  String new_user_email_template_path;
+		
+	@Value("${password_reset.email.template_path}")
+	private  String password_reset_email_template_path;
+		
 	
 	@Autowired
 	PermissionsDAO permissionsDAO;
@@ -183,9 +189,10 @@ public class ProviderController {
 		
 		String token = generateToken();
 		
-		String link = sendEmail(token, provider.getEmail(), provider.getName());
+		String link = sendEmail(token, provider.getEmail(), provider.getName(), true);
 		
 		provider.setPassword("RESET "+token);
+		provider.setReset_token("RESET "+token);
 		
 		
 		try {
@@ -389,8 +396,8 @@ public class ProviderController {
 			throw new SQLException("Invalid username or email");
 		
 		String token = generateToken();
-		sendEmail(token, provider.getEmail(), provider.getName());
-		provider.setPassword("RESET "+token);
+		sendEmail(token, provider.getEmail(), provider.getName(), false);
+		provider.setReset_token("RESET "+token);
 		
 		try {
 			providerDao.save(provider);
@@ -426,14 +433,14 @@ public class ProviderController {
   
         return sb.toString(); 
     } 
-	private String sendEmail(String token, String email, String name) throws NoResposneException, EntityNotFoundException {
+	private String sendEmail(String token, String email, String name, boolean isNewUser) throws NoResposneException, EntityNotFoundException {
 		
 		
 		SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(email);
 
         msg.setSubject("IFEDs Password Reset Link");
-        msg.setText(generateEmailBody(name, password_reset_link+"" + token));
+        msg.setText(generateEmailBody(name, password_reset_link+"" + token, isNewUser));
        
         try {
         	javaMailSender.send(msg);	
@@ -445,10 +452,14 @@ public class ProviderController {
         
 	}
 	
-	private String generateEmailBody(String name, String link) throws NoResposneException {
+	private String generateEmailBody(String name, String link, boolean newUser) throws NoResposneException {
 		try {
+			Resource resource = null;
+			if(newUser)
+				resource = resourceLoader.getResource(new_user_email_template_path);
+			else
+				resource = resourceLoader.getResource(password_reset_email_template_path);
 			
-			Resource resource = resourceLoader.getResource("classpath:EmailTemplate.txt");
 		    InputStream inputStream = resource.getInputStream();
 		    byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
 	        String data = new String(bdata, StandardCharsets.UTF_8);
@@ -461,10 +472,10 @@ public class ProviderController {
 		        	int endIndex = line.lastIndexOf(']');
 		        	
 		        	switch(line.substring(startIndex, endIndex + 1)) {
-		        		case "[username]" : 
+		        		case "[NAME]" : 
 		        			line = line.substring(0, startIndex) + name+""+line.substring(endIndex + 1); 
 		        			break;
-		        		case "[link]":
+		        		case "[LINK]":
 		        			line = line.substring(0, startIndex) +link+ line.substring(endIndex + 1); 
 		        			break;
 		        	}
@@ -490,16 +501,14 @@ public class ProviderController {
 			@ApiResponse(code = 403, message = "Bad URL Request"),
 			@ApiResponse(code = 404, message = "Requested URL not found") })
 	public String resetPassword(HttpServletRequest request, HttpServletResponse response, @RequestBody ResetPasswordBean resetPassword, @PathVariable String token) throws EntityNotFoundException, SQLException, NoResposneException, ForbiddenException{
-		System.out.println(password);
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		
 		String user = resetPassword.getUsername();
 		String resetToken = token;
 		Provider provider = providerDao.findByUsername(user);
-		String password = provider.getPassword();
-		String[] pass = password.split(" ");
-	
-		if(pass[1].equals(resetToken)) {
+		String reset_token = provider.getReset_token();
+		
+		if(reset_token.equals(resetToken)) {
 
 			
 			if(resetPassword.getNew_password().length() > 64) 

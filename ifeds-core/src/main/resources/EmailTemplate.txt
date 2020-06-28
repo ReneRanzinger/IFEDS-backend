@@ -1,9 +1,0 @@
-Hello [username],
-
-An new account has been created for you in the IFEDS data repository. Please use this link to create a new password for your account:
-[link]
-
-In case of problems please contact Rene Ranzinger (rene@ccrc.uga.edu).
-
-Thanks You,
-IFEDS Team
