@@ -98,7 +98,8 @@ CREATE TABLE core.dataset
 	sample_id integer NOT NULL REFERENCES core.sample ON UPDATE CASCADE ON DELETE CASCADE,
 	provider_id integer NOT NULL REFERENCES core.provider ON UPDATE CASCADE ON DELETE CASCADE,
 	description VARCHAR(1000),
-	is_public BOOLEAN NOT NULL
+	is_public BOOLEAN NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE core.data_type
