@@ -173,6 +173,7 @@ public class DatasetController {
 				b.setDescription(ds.getDescription());
 				b.setSampleName(ds.getSample().getName());
 				b.setProviderName(ds.getProvider().getName());
+				b.setCreated_at(ds.getCreated_at());
 				res.add(b);
 			}
 		} else {
@@ -194,6 +195,7 @@ public class DatasetController {
 					b.setDescription(ds.getDescription());
 					b.setSampleName(ds.getSample().getName());
 					b.setProviderName(ds.getProvider().getName());
+					b.setCreated_at(ds.getCreated_at());
 					res.add(b);
 				}
 			}
@@ -685,7 +687,6 @@ public class DatasetController {
 		
 		 //if its a last chunk, then save the file in db and rename the file name
 		 if (resumableTotalChunks == resumableChunkNumber) {
-	            System.out.println("File uploaded successfuly");
 	            long file_size = FileChannel.open(tempFile).size();
 	            
 	            //save the file in db
@@ -819,7 +820,7 @@ public class DatasetController {
 			
 			deletePhysicalFile(id);
 			try {
-			dataFileDAO.deleteById(id);
+				dataFileDAO.deleteById(id);
 			}catch(Exception e){
 				throw new NoResposneException("Something went wrong. Please try after sometime");
 			}

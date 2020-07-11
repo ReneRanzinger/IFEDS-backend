@@ -1,5 +1,7 @@
 package edu.uga.ccrc.entity;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -34,7 +36,10 @@ public class Dataset {
 	
 	@Column(length=1000)
 	private String description;
-	
+
+	@Column(name="created_at", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+	private Timestamp created_at;
+
 	@Column(name="is_public",nullable=false)
 	private Boolean isPublic;
 	
@@ -53,7 +58,9 @@ public class Dataset {
 	@OneToMany(mappedBy = "dataset")
     Set<DataFile> dataFiles;
 
-	public Dataset() {}
+	public Dataset() {
+		created_at = new Timestamp(System.currentTimeMillis());
+	}
 
 	public Long getDatasetId() {
 		return datasetId;
@@ -141,5 +148,17 @@ public class Dataset {
 
 	public void setDataFiles(Set<DataFile> dataFiles) {
 		this.dataFiles = dataFiles;
+	}
+
+	public Timestamp getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(Timestamp created_at) {
+		this.created_at = created_at;
+	}
+
+	public Boolean getIsPublic() {
+		return isPublic;
 	}
 }

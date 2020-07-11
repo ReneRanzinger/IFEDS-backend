@@ -1,5 +1,7 @@
 package edu.uga.ccrc.view.bean;
 
+import java.sql.Timestamp;
+
 public class DatasetBean {
 	
 	private Long datasetId;
@@ -13,6 +15,8 @@ public class DatasetBean {
 	private String description;
 	
 	private int num_of_files;
+	
+	private Timestamp created_at;
 
 	public Long getDatasetId() {
 		return datasetId;
@@ -60,6 +64,14 @@ public class DatasetBean {
 
 	public void setNum_of_files(int num_of_files) {
 		this.num_of_files = num_of_files;
+	}
+
+	public Timestamp getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(Timestamp created_at) {
+		this.created_at = created_at;
 	}
 
 }
