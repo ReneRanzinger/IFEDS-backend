@@ -548,6 +548,9 @@ public class DatasetController {
 					FundingGrant fundingGrant = new FundingGrant();
 					
 					//find funding source
+					if(fundGrant.getFunding_source_id() == null)
+						throw new EntityNotFoundException("Funding source cannot be null");
+					
 					FundingSource fundingSource = fundingSourcetDAO.findById(fundGrant.getFunding_source_id()).orElse(null);
 					
 					if(fundingSource == null) {
@@ -569,6 +572,9 @@ public class DatasetController {
 		//3)Save dataset-to-experimentType
 		for(CreateDatasetToExperimentTypeHelperBean expTypeIdAndDes :createDatasetHelperBean.getExperiment_types()) {
 					
+					if(expTypeIdAndDes.getExperiment_type_id() == null)
+						throw new EntityNotFoundException("Experiment type cannot be null");
+			
 					//get experiment type
 					ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
 					
