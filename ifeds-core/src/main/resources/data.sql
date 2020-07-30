@@ -1,0 +1,6 @@
+ALTER TABLE core.funding_grant
+ADD url VARCHAR(256);
+
+
+ALTER TABLE core.dataset
+ADD created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ;
