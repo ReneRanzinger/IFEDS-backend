@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,14 +100,14 @@ public class ProviderController {
 	@Autowired
 	PermissionsDAO permissionsDAO;
 	
-
+	final static Logger log = LoggerFactory.getLogger(ProviderController.class);
 	
 	private boolean userIsAdmin(String username) {
 		
 		Provider provider = providerDao.findByUsername(username);
 		
 		Permissions p = permissionsDAO.findByProviderId(provider.getProviderId());
-		System.out.println("Provider id : "+p.getPermission_level());
+		log.info("Provider id : "+p.getPermission_level());
 		if(p.getPermission_level().equals("admin"))
 			return true;
 		
@@ -213,7 +216,7 @@ public class ProviderController {
 			@ApiResponse(code = 403, message = "Accessing the Provider Info is forbidden"),
 			@ApiResponse(code = 404, message = "The Provider Info is not found") })
 	public ProviderBean findInformation(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("Retrieving provider information : findByUsername() ");
+		log.info("Retrieving provider information : findByUsername() ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		
 		String jwtToken = requestTokenHeader.substring(7);
@@ -243,7 +246,7 @@ public class ProviderController {
 			@ApiResponse(code = 404, message = "The Provider Info is not found") })
 	public String updateProviderInformation(HttpServletRequest request, HttpServletResponse response, @RequestBody ProviderBean providerBean) throws EntityNotFoundException, SQLException, NoResposneException {
 		
-		System.out.println("Updating provider information ");
+		log.info("Updating provider information ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
@@ -296,7 +299,7 @@ public class ProviderController {
 			@ApiResponse(code = 403, message = "Accessing provider dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The provider dataset is not found") })
 	public List<DatasetBean> getProviderDataSets(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
-		System.out.println("Retrieving provider's uploaded dataset information : findByUsername() ");		
+		log.info("Retrieving provider's uploaded dataset information : findByUsername() ");		
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
@@ -371,7 +374,7 @@ public class ProviderController {
 				return "{\n\t Success \n}";
 			}
 			catch(Exception e ){
-				System.out.println("Old password doesn't match with user password");
+				log.error("Old password doesn't match with user password");
 			}
 			
 		}
@@ -447,6 +450,7 @@ public class ProviderController {
         	return password_reset_link+"" + token;
         }catch(Exception e)
         {
+        	log.error("Error occured while sending email"+ e.getMessage());
         	throw new EntityNotFoundException("Send email not working");
         }
         

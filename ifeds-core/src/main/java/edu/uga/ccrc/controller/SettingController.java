@@ -3,6 +3,8 @@ package edu.uga.ccrc.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +29,8 @@ public class SettingController {
 	@Autowired
 	SettingsDAO settingsDAO;
 	
+	final static Logger log = LoggerFactory.getLogger(SampleTypeController.class);
+	
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.GET, value = "/init", produces="application/json")
 	@ApiOperation(value = "Init WebService", response = String.class)
@@ -34,7 +38,7 @@ public class SettingController {
 			@ApiResponse(code = 403, message = "Already initialised"),
 			@ApiResponse(code = 404, message = "Error") })
 	public String init(@PathVariable String key, @PathVariable String value) throws NoResposneException{
-//		System.out.println("In init web service");
+		log.info("In init web service");
 		//1. Check if key already exists. If exists, then flush it
 		if(settingsDAO.existsByKey(key) != null) {
 			settingsDAO.deleteByKey(key);
@@ -61,7 +65,7 @@ public class SettingController {
 			@ApiResponse(code = 404, message = "Error") })
 	public List<SettingsBean> get_settings() throws NoResposneException{
 		List<SettingsBean> resultBean = new ArrayList<>();
-//		System.out.println("Get settings");
+		log.info("Get settings");
 		for(Settings setting : settingsDAO.findAll()) {
 			SettingsBean settingBean = new SettingsBean();
 			settingBean.setKey(setting.getKey());

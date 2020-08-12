@@ -3,6 +3,8 @@ package edu.uga.ccrc.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,8 @@ public class SampleDescriptorController {
 	@Autowired
 	SampleDescriptorDAO SampleDescriptorDAO;
 	
+	final static Logger log = LoggerFactory.getLogger(SampleController.class);
+	
 	/*
 	 * the method returns list of sameDescriptors
 	 * */
@@ -36,7 +40,7 @@ public class SampleDescriptorController {
 			@ApiResponse(code = 404, message = "The sample descriptor resource is not found") })
 	public List<SampleDescriptorBean> listAllSampleDescriptors(){
 		List<SampleDescriptorBean> result = new ArrayList<>();
-		System.out.println("Getting Sample Descriptors");
+		log.info("Getting Sample Descriptors");
 		try {
 			
 			for(SampleDescriptor sampleDescriptor : SampleDescriptorDAO.findAll()) {
@@ -55,6 +59,7 @@ public class SampleDescriptorController {
 			
 			return result;
 		}catch(Exception e) {
+			log.error(e.getMessage());
 			return result;
 		}
 		

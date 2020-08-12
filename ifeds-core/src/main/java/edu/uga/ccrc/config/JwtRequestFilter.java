@@ -5,6 +5,9 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import edu.uga.ccrc.controller.DatasetController;
 import edu.uga.ccrc.exception.ForbiddenException;
 import edu.uga.ccrc.exception.NoResposneException;
 import edu.uga.ccrc.service.JwtUserDetailsService;
@@ -27,6 +31,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	
+	final static Logger log = LoggerFactory.getLogger(JwtRequestFilter.class);
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -45,10 +51,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				//parse username from token. (UtilFunction)
 				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 			} catch (IllegalArgumentException e) {
-				System.out.println("Unable to get JWT Token");
+				log.error("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
 
-				System.out.println("JWT Token has expired. Direct user to login page");
+				log.error("JWT Token has expired. Direct user to login page");
 			}
 		} 
 		// if username valid then validate the token.
@@ -58,7 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				userDetails = this.jwtUserDetailsService.loadUserByUsername(username);	
 			}catch(Exception e){
 			
-				System.out.println("token didn't match");
+				log.error("token didn't match");
 				return;
 			}
 			// if token is valid configure Spring Security to manually set authentication

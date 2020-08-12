@@ -3,6 +3,8 @@ package edu.uga.ccrc.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ public class SampleTypeController {
 	@Autowired
 	SampleDescriptorDAO SampleDescriptorDAO;
 	
+	final static Logger log = LoggerFactory.getLogger(SampleTypeController.class);
 	/*
 	 * the method returns list of Sample Types
 	 * 
@@ -40,7 +43,7 @@ public class SampleTypeController {
 			@ApiResponse(code = 403, message = "Accessing the sample type is forbidden"),
 			@ApiResponse(code = 404, message = "The sample type resource is not found") })
 	public List<SampleTypeBean> listAllSampleType(){
-		System.out.println("Getting Sample Types");
+		log.info("Getting Sample Types");
 		List<SampleTypeBean> result = new ArrayList<>();
 		
 		for(SampleType sampleType : SampleTypeDAO.findAll()) {
@@ -57,9 +60,6 @@ public class SampleTypeController {
 		
 		return result;
 	}
-	
-	
-	
 	
 	
 }

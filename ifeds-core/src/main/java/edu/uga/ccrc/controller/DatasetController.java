@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -24,7 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.hibernate.JDBCException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -137,6 +141,8 @@ public class DatasetController {
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	
+	final static Logger log = LoggerFactory.getLogger(DatasetController.class);
 
 	/*
 	 *  this method returns the dataset details. Not information in m-n tables
@@ -155,7 +161,7 @@ public class DatasetController {
 	// http://localhost:8080/datasets
 	public List<DatasetBean> getAllDatasets(HttpServletRequest request) throws SQLException, EntityNotFoundException {
 
-		System.out.println("Retrieving datasets : getAllDatasets() ");
+		log.info("Retrieving datasets : getAllDatasets() ");
 		List<DatasetBean> res = new ArrayList<DatasetBean>();
 
 		// Check if request header contains authorization token
@@ -163,7 +169,7 @@ public class DatasetController {
 
 		// If token header is null
 		if (requestTokenHeader == null) {
-			System.out.println("Retrieving public datasets");
+			log.info("Retrieving public datasets");
 
 			// View all public datasets
 			for (Dataset ds : datasetDAO.findPublicDatasets()) {
@@ -177,7 +183,7 @@ public class DatasetController {
 				res.add(b);
 			}
 		} else {
-			System.out.println("Retrieving public and owner-specific datasets");
+			log.info("Retrieving public and owner-specific datasets");
 			String jwtToken = requestTokenHeader.substring(7);
 			String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 
@@ -212,7 +218,7 @@ public class DatasetController {
 	@RequestMapping(method = RequestMethod.DELETE, value = "/datasets/{id}", produces = "application/json")
 	@ApiOperation(value = "Delete a dataset")
 	public void deleteDataset(@PathVariable long id) throws SQLException {
-		System.out.println("Deleting datasets : deleteDataset() id : " + id);
+		log.info("Deleting datasets : deleteDataset() id : " + id);
 		Dataset d = datasetDAO.findById(id).orElse(null);
 		if(d == null)
 			throw new SQLException("Dataset id not valid");
@@ -239,7 +245,7 @@ public class DatasetController {
 	// http://localhost:8080/dataset/1;
 	public DatasetDetailBean getDatasetDetail(HttpServletRequest request, @PathVariable long datasetId) throws EntityNotFoundException, ForbiddenException{
 
-		System.out.println("Retrieving dataset detail : getDatasetDetail() ");
+		log.info("Retrieving dataset detail : getDatasetDetail() ");
 
 		DatasetDetailBean b = new DatasetDetailBean();
 
@@ -248,7 +254,7 @@ public class DatasetController {
 
 		// If there is no token header, display dataset detail only if dataset is public
 		if (requestTokenHeader == null) {
-			System.out.println("Get dataset detail " + datasetId);
+			log.info("Get dataset detail " + datasetId);
 			Optional<Dataset> ds = datasetDAO.findById(datasetId);
 			
 			//Throw EntityNotFoundException if ds is null
@@ -261,7 +267,7 @@ public class DatasetController {
 					throw new ForbiddenException("Accessing the dataset with id "+datasetId+" is forbidden");
 			}
 		} else {
-			System.out.println("Token header present");
+			log.info("Token header present");
 
 			// If token header is present, fetch provider from token
 			String jwtToken = requestTokenHeader.substring(7);
@@ -270,7 +276,7 @@ public class DatasetController {
 			Provider provider = providerDAO.findByUsername(username);
 
 			
-			System.out.println("Provider id :" + provider.getProviderId() + " " + "Dataset id :" + datasetId);
+			log.info("Provider id :" + provider.getProviderId() + " " + "Dataset id :" + datasetId);
 
 			// Allow provider to view dataset detail if he's the owner or if the dataset is public
 			Iterator<Dataset> dsIter = datasetDAO.findPublicOrProviderDataset(datasetId, provider.getProviderId())
@@ -435,7 +441,7 @@ public class DatasetController {
 			ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
 			
 			if(experimentType == null) {
-				System.out.println("deleteing dataset" + dataset.getDatasetId());
+				log.info("deleteing dataset" + dataset.getDatasetId());
 				datasetDAO.deleteById(dataset.getDatasetId());
 				throw new EntityNotFoundException("Experiment type doesn't exists : " + expTypeIdAndDes.getExperiment_type_id());
 			}
@@ -522,7 +528,7 @@ public class DatasetController {
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String updateDataset(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody  CreateDatasetHelperBean createDatasetHelperBean) throws EntityNotFoundException {
 		
-		System.out.println("In update dataset : ");
+		log.info("In update dataset : ");
 		
 		//1. Reterive the dataset with the particular id
 		Dataset dataset = datasetDAO.findById(id).orElse(null);
@@ -579,7 +585,7 @@ public class DatasetController {
 					ExperimentType experimentType = experimentTypeDAO.findById(expTypeIdAndDes.getExperiment_type_id()).orElse(null);
 					
 					if(experimentType == null) {
-						System.out.println("deleteing dataset" + dataset.getDatasetId());
+						log.info("deleteing dataset" + dataset.getDatasetId());
 						datasetDAO.deleteById(dataset.getDatasetId());
 						throw new EntityNotFoundException("Experiment type doesn't exists");
 					}
@@ -683,9 +689,11 @@ public class DatasetController {
 		//save the file in the temporary file
 		 Path tempFile = Paths.get("datasetFile", resumableFilename + ".tmp");
 		 ByteBuffer out = ByteBuffer.wrap(file.getBytes());
-		 
+		 log.info("In upload file service for fileName {}", resumableFilename);
 		 try (FileChannel channel = FileChannel.open(tempFile, StandardOpenOption.WRITE,StandardOpenOption.CREATE)) {
-	            channel.position((resumableChunkNumber - 1) * resumableChunkSize);
+			 	
+			    log.debug("FileName {}, ResumableChunkSize {}, CurrentChunkNumber: {}, TotalChunks {}", resumableFilename, resumableChunkSize, resumableChunkNumber, resumableTotalChunks);
+			 	channel.position((resumableChunkNumber - 1) * resumableChunkSize);
 	            while (out.hasRemaining()) {
 	                channel.write(out);
 	            }
@@ -693,28 +701,32 @@ public class DatasetController {
 		
 		 //if its a last chunk, then save the file in db and rename the file name
 		 if (resumableTotalChunks == resumableChunkNumber) {
+			
 	            long file_size = FileChannel.open(tempFile).size();
 	            
 	            //save the file in db
 	            long dataFileId = saveUploadedFile("datasetFile", resumableFilename.split(",")[0], file_size);
 	            
 	            //save the file in system with the name as file id
-	            Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
-	            
+	            try {
+	            	Files.move(tempFile, Paths.get("datasetFile", ""+dataFileId), StandardCopyOption.REPLACE_EXISTING);
+	            }catch(Exception e){
+	            	log.error("Error while storing file " + e.getMessage());
+	            }
 	            //prepare result bean with success message
 	            FileUploadBean result = new FileUploadBean(dataFileId, "File Uploaded Successfully");
 	            
+	            log.info("All chunks recieved for FileName {}, dataFileId {}, file moved to", resumableFilename,dataFileId, Paths.get("datasetFile", ""+dataFileId).toString());
+
 	            //return
 	            return result;
 	            
 	        } else {
-	        	System.out.println("File uploaded in progress");
+	        	log.info("File uploaded in progress");
 	        	FileUploadBean result = new FileUploadBean((long)-1, "File uploaded in progress");
 	        	return result;
 	        }
 		 
-	
-		
 	}
 	
 	/*
@@ -750,7 +762,7 @@ public class DatasetController {
 			@ApiResponse(code = 403, message = "Accessing the dataset is forbidden"),
 			@ApiResponse(code = 404, message = "The dataset resource is not found") })
 	public String saveMetaInformation( @RequestBody DataFileInfoBean dataFileInfo ) throws NoResposneException, SQLException, EntityNotFoundException {
-		System.out.println("Inside save file");
+		log.info("Inside save file");
 		//get dataFile
 		DataFile dataFile = dataFileDAO.findById(dataFileInfo.getFile_id()).orElse(null);
 		//get dataset
@@ -819,7 +831,7 @@ public class DatasetController {
 	@RequestMapping(method = RequestMethod.DELETE, value = "/dataFiles/{id}", produces="application/json")
 	@ApiOperation(value = "Delete a file")
 	public String deleteUploadedFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException {
-		System.out.println("In delete file");
+		log.info("In delete file");
 		
 			if(!dataFileDAO.existsById(id))
 				throw new EntityNotFoundException("File id doesn't exist");
@@ -844,7 +856,7 @@ public class DatasetController {
 		// TODO Auto-generated method stub
 		try
         { 
-			System.out.println("In delete physical file" +id);
+			log.info("In delete physical file" +id);
             Files.delete(Paths.get("datasetFile/"+id)); 
         } 
         catch(NoSuchFileException e) 
@@ -865,13 +877,13 @@ public class DatasetController {
 	@RequestMapping(method = RequestMethod.GET, value = "/dataFiles/{id}", produces="application/json")
 	@ApiOperation(value = "Sends byte array of the uploaded file. Client need to convert the file to required type")
 	public byte[] downloadFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException, IOException {
-		System.out.println("In delete file");
+			log.info("In download file for id : "+id);
 		
 			if(!dataFileDAO.existsById(id))
 				throw new EntityNotFoundException("File id doesn't exist");
 
 			try {
-				Path path = Paths.get("datasetFile/test.txt");
+				Path path = Paths.get("datasetFile/"+id);
 			    byte[] data = Files.readAllBytes(path);
 				return data;
 			}catch(FileNotFoundException e){

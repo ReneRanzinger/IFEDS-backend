@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +66,7 @@ public class SampleController {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	
-	
+	final static Logger log = LoggerFactory.getLogger(SampleController.class);
 	/*
 	 * this method returns the list of the samples belonging to particular provider
 	 * 
@@ -76,7 +78,7 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Accessing the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample resource is not found") })
 	public List<SampleWithDescriptorListBean> getSamples(HttpServletRequest request, HttpServletResponse response) throws EntityNotFoundException {
-		System.out.println("Retrieving provider's uploaded dataset information : getSamples() ");
+		log.info("Retrieving provider's uploaded dataset information : getSamples() ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		//token starts after 7th position as token is appnended with 'Bearer' 
 		String jwtToken = requestTokenHeader.substring(7);
@@ -130,7 +132,7 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Creating the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample is not created") })
 	public String createSample(HttpServletRequest request, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws SQLException, EntityNotFoundException{
-		//System.out.println("In Create Sample : ");
+		log.info("In Create Sample : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		//get username from token
@@ -198,7 +200,7 @@ public class SampleController {
 			@ApiResponse(code = 403, message = "Updating the sample is forbidden"),
 			@ApiResponse(code = 404, message = "The sample is not updated") })
 	public String updateSample(HttpServletRequest request, @PathVariable Long id, @Valid  @RequestBody CreateSampleHelperBean sampleHelperBean) throws EntityNotFoundException {
-//		System.out.println("In update Sample : ");
+		log.info("In update Sample : ");
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String jwtToken = requestTokenHeader.substring(7);
 		//get username from token
@@ -261,7 +263,7 @@ public class SampleController {
 		List<String> res = new ArrayList<>();
 		if(sampleDAO.findById(id).orElse(null) == null)
 			throw new EntityNotFoundException("Id not present : " + id);
-		//System.out.println("Deleting Sample : deleteSample() id : " + id);
+		log.info("Deleting Sample : deleteSample() id : " + id);
 		sampleDAO.deleteById(id);
 		res.add("Sample with id " + id +" deleted successfully");	
 			

@@ -13,6 +13,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,7 @@ public class PaperController {
 	@Autowired
 	PaperDAO paperDAO;
 	
+	final static Logger log = LoggerFactory.getLogger(PaperController.class);
 
 	/*
 	 * this method gets information from the PubMed. It makes API call to the PubMed server to get the information
@@ -61,13 +65,13 @@ public class PaperController {
 		
 		if(paperDAO.findByPMId(pmid) != null)
 		{
-			//System.out.println("Paper already in db. Returning the meta-info");
+			log.info("Paper already {} in db. Returning the meta-info", pmid);
 			Paper paper = paperDAO.findByPMId(pmid);
 			PaperBean paperBean = new PaperBean(paper.getTitle(),paper.getAuthorList(),paper.getJournalName(),pmid, paper.getUrl());
 			return paperBean;
 		}
 		
-		System.out.println("New paper. Saving to db and returning meta-info. \n User accessed getPaperMetaData : " + pmid);
+		log.info("New paper. Saving to db and returning meta-info. \n User accessed getPaperMetaData : " + pmid);
 		String url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id="+pmid+"&retmode=json&tool=my_tool";
 		JSONObject json = readJsonFromUrl(url);
 		
@@ -114,7 +118,7 @@ public class PaperController {
 			try {
 				paperDAO.save(paper);
 			}catch (Exception e){
-				System.out.println(e.getLocalizedMessage());
+				log.error(e.getLocalizedMessage());
 				throw new NoResposneException("Cannot save the paper");
 			}
 		}

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -78,12 +80,14 @@ public class DictionaryController {
 	@Autowired
 	ProviderDAO providerDao;
 	
+	final static Logger log = LoggerFactory.getLogger(DictionaryController.class);
+	
 	private boolean userIsAdmin(String username) {
 		
 		Provider provider = providerDao.findByUsername(username);
 		
 		Permissions p = permissionsDAO.findByProviderId(provider.getProviderId());
-		System.out.println("Provider id : "+p.getPermission_level());
+		log.info("Provider id : "+p.getPermission_level());
 		if(p.getPermission_level().equals("admin"))
 			return true;
 		
