@@ -95,7 +95,6 @@ public class ProviderController {
 		
 	@Value("${password_reset.email.template_path}")
 	private  String password_reset_email_template_path;
-		
 	
 	@Autowired
 	PermissionsDAO permissionsDAO;
@@ -438,6 +437,7 @@ public class ProviderController {
     } 
 	private String sendEmail(String token, String email, String name, boolean isNewUser) throws NoResposneException, EntityNotFoundException {
 		
+		log.info("New user created. Sending password link to email to email " + email);
 		
 		SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(email);
