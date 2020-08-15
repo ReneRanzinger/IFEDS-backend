@@ -17,6 +17,9 @@ public interface DataFileDAO extends JpaRepository<DataFile,Long>{
 	
 	@Query(value="SELECT count(*) FROM core.data_file where dataset_id = ?1",nativeQuery=true)
 	public int numberOfDataFiles(Long dataset_id);
+
+	@Query(value="SELECT original_file_name FROM core.data_file where data_file_id = ?1",nativeQuery=true)
+	public String findOriginalFileName(Long id);
 	
 
 }

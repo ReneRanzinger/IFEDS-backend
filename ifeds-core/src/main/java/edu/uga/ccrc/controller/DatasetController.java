@@ -29,6 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -875,23 +880,59 @@ public class DatasetController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/dataFiles/{id}", produces="application/json")
-	@ApiOperation(value = "Sends byte array of the uploaded file. Client need to convert the file to required type")
-	public byte[] downloadFile(@PathVariable Long id) throws NoResposneException, EntityNotFoundException, IOException {
+	@ApiOperation(value = "Downloads file")
+	public ResponseEntity<Resource> downloadFile(@PathVariable Long id, HttpServletRequest request) throws NoResposneException, EntityNotFoundException, IOException {
+			
 			log.info("In download file for id : "+id);
-		
+			
+			Path filePath = null;
 			if(!dataFileDAO.existsById(id))
 				throw new EntityNotFoundException("File id doesn't exist");
 
 			try {
-				Path path = Paths.get("datasetFile/"+id);
-			    byte[] data = Files.readAllBytes(path);
-				return data;
-			}catch(FileNotFoundException e){
-				throw new NoResposneException("Something went wrong with File Download"+e.getMessage());
+				log.info("Reterving file's orginal name");
+				filePath = createFileWithOrginalFileName(id);
+
+				Resource resource = new UrlResource(filePath.toUri());
+			    String contentType = getContentType();
+			    
+			    return ResponseEntity.ok()
+		                .contentType(MediaType.parseMediaType(contentType))
+		                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+		                .body(resource);
+			
 			}catch(Exception e){
 				throw new NoResposneException("Something went wrong. Please try after sometime"+e.getMessage());
+
+			}finally{
+				deleteFileWithOrginalFileName(filePath);
 			}
-			
+	}
+
+	private void deleteFileWithOrginalFileName(Path filePath) throws IOException {
+		log.info("Deleting orginal file name's file " +filePath.getFileName());
+       // Files.delete(filePath); 
+	}
+
+	private Path createFileWithOrginalFileName(Long id) throws NoResposneException {
+		String fileName =  "datasetFile/" + id;
+		String orginalFileName = "datasetFile/"+dataFileDAO.findOriginalFileName(id);
+		
+		log.info("Original file name is " + orginalFileName);
+		
+		try {
+			Files.copy(Paths.get(fileName), Paths.get(orginalFileName),
+			        StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			log.info(e.getMessage());
+			throw new NoResposneException("Something went wrong while preparing file for download");
+		}	
+		
+		return Paths.get(orginalFileName);
+	}
+
+	private String getContentType() {
+		return "application/octet-stream";
 	}
 	
 	
