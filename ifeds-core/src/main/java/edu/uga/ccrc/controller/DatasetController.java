@@ -99,6 +99,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
+import javax.servlet.http.HttpServletResponse;
+
 @CrossOrigin
 @Api(value = "ifeds", description = "Operations pertaining to dataset")
 @RestController
@@ -881,27 +883,31 @@ public class DatasetController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/dataFiles/{id}", produces="application/json")
 	@ApiOperation(value = "Downloads file")
-	public ResponseEntity<Resource> downloadFile(@PathVariable Long id, HttpServletRequest request) throws NoResposneException, EntityNotFoundException, IOException {
+	public void downloadFile(@PathVariable Long id, HttpServletRequest request,  HttpServletResponse response) throws NoResposneException, EntityNotFoundException, IOException {
 			
 			log.info("In download file for id : "+id);
 			
 			Path filePath = null;
 			if(!dataFileDAO.existsById(id))
 				throw new EntityNotFoundException("File id doesn't exist");
-
+			
+			
 			try {
 				log.info("Reterving file's orginal name");
 				filePath = createFileWithOrginalFileName(id);
-
-				Resource resource = new UrlResource(filePath.toUri());
-			    String contentType = getContentType();
-			    
-			    return ResponseEntity.ok()
-		                .contentType(MediaType.parseMediaType(contentType))
-		                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-		                .body(resource);
 			
+				String fileType = filePath.getFileName().toString().split("\\.")[1];
+				
+				Resource resource = new UrlResource(filePath.toUri());
+			    
+			    response.setContentType("application/"+fileType);
+	            response.addHeader("Content-Disposition", "attachment; filename="+resource.getFilename());
+	            
+	            Files.copy(filePath, response.getOutputStream());
+                response.getOutputStream().flush();
+
 			}catch(Exception e){
+				e.printStackTrace();
 				throw new NoResposneException("Something went wrong. Please try after sometime"+e.getMessage());
 
 			}finally{
@@ -931,10 +937,5 @@ public class DatasetController {
 		return Paths.get(orginalFileName);
 	}
 
-	private String getContentType() {
-		return "application/octet-stream";
-	}
-	
-	
 	
 }
